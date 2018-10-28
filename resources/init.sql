@@ -1,0 +1,8 @@
+CREATE EXTENSION IF NOT EXISTS citext;
+
+CREATE TABLE IF NOT EXISTS Users (
+  nickname CITEXT COLLATE "ucs_basic" NOT NULL UNIQUE,
+  fullname VARCHAR,
+  about    TEXT,
+  email    CITEXT COLLATE "ucs_basic" NOT NULL UNIQUE
+);

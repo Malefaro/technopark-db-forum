@@ -1,0 +1,148 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "beego Test API",
+        "description": "beego has a very cool tools to autogenerate documents for your API",
+        "version": "1.0.0",
+        "termsOfService": "http://beego.me/",
+        "contact": {
+            "email": "astaxie@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "basePath": "/api",
+    "paths": {
+        "/forum/create": {
+            "get": {
+                "tags": [
+                    "forum"
+                ],
+                "description": "get Thread from url",
+                "operationId": "ThreadController.GetAll",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                }
+            }
+        },
+        "/forum/{slug}/create": {
+            "get": {
+                "tags": [
+                    "forum"
+                ],
+                "description": "get Thread from url",
+                "operationId": "ThreadController.GetAll",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/": {
+            "get": {
+                "tags": [
+                    "post"
+                ],
+                "description": "get Thread from url",
+                "operationId": "ThreadController2.GetAll2",
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/models.Thread"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Object": {
+            "title": "Object",
+            "type": "object",
+            "properties": {
+                "ObjectId": {
+                    "type": "string"
+                },
+                "PlayerName": {
+                    "type": "string"
+                },
+                "Score": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "models.Profile": {
+            "title": "Profile",
+            "type": "object",
+            "properties": {
+                "Address": {
+                    "type": "string"
+                },
+                "Age": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Email": {
+                    "type": "string"
+                },
+                "Gender": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Thread": {
+            "title": "Thread",
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "Name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "title": "User",
+            "type": "object",
+            "properties": {
+                "Id": {
+                    "type": "string"
+                },
+                "Password": {
+                    "type": "string"
+                },
+                "Profile": {
+                    "$ref": "#/definitions/models.Profile"
+                },
+                "Username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "forum",
+            "description": "custom controller\n"
+        },
+        {
+            "name": "post",
+            "description": "custom controller2\n"
+        }
+    ]
+}
