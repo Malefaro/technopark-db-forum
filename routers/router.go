@@ -8,10 +8,8 @@
 package routers
 
 import (
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/malefaro/technopark-db-forum/controllers"
-	"github.com/malefaro/technopark-db-forum/database"
 )
 
 func init() {
@@ -64,13 +62,11 @@ func init() {
 		//),
 		beego.NSNamespace("/user",
 			beego.NSInclude(
-				&controllers.UserController{DB:database.GetDataBase()},
+				&controllers.UserController{},
 			),
 		),
-
 	)
 	beego.AddNamespace(ns)
-	fmt.Println(database.GetDataBase())
 	//beego.Router("/", &controllers.UserController{}, "get:GetAll")
 	//beego.Router("/q", &controllers.Test{}, "get:Test")
 }
