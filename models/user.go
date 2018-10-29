@@ -42,3 +42,18 @@ func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	}
 	return user, nil
 }
+
+//func GetUsersByEmailOrNickname(db *sql.DB, email, nickname string) ([]*User, error) {
+//	result := make([]*User,0)
+//	row, err := db.Query("select * from users where email = $1 or nickname = $2", email, nickname)
+//	if err != nil {
+//		return nil, error
+//	}
+//	user := &User{}
+//	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
+//	if err != nil {
+//		log.Printf("Function: GetUserByEmail, Email: %s, Error: %v", email, err)
+//		return nil, err
+//	}
+//	return user, nil
+//}

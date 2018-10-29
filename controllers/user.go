@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
+	"reflect"
 
 	"net/http"
 
@@ -28,14 +29,22 @@ func (u *UserController) Post() {
 	nickname := u.GetString(":nickname")
 	user := &models.User{Nickname: nickname}
 	json.Unmarshal(body, &user)
-	result := make([]*models.User, 1)
+	result := make([]*models.User, 0)
+	//var usernick *models.User
+	//var useremail *models.User
+	//usernick, _ =  models.GetUserByNickname(db, user.Nickname)
+	//useremail, _  = models.GetUserByEmail(db, user.Email)
+	//if
 	var us *models.User
 	if us, _ = models.GetUserByEmail(db, user.Email); us != nil {
 		result = append(result, us)
 	}
 	if us, _ = models.GetUserByNickname(db, user.Nickname); us != nil {
-		if len(result) == 0 || result[0] != us {
+		if len(result) != 0 && !reflect.DeepEqual(result[0],us) {
 			result = append(result, us)
+		}
+		if len(result) == 0{
+			result = append(result,us)
 		}
 	}
 	if len(result) != 0 {
