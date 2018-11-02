@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
-	"reflect"
-
+	"log"
 	"net/http"
 
 	"github.com/astaxie/beego"
@@ -28,24 +27,12 @@ func (u *UserController) Post() {
 	body := u.Ctx.Input.RequestBody
 	nickname := u.GetString(":nickname")
 	user := &models.User{Nickname: nickname}
-	json.Unmarshal(body, &user)
+	json.Unmarshal(body, user)
 	result := make([]*models.User, 0)
-	//var usernick *models.User
-	//var useremail *models.User
-	//usernick, _ =  models.GetUserByNickname(db, user.Nickname)
-	//useremail, _  = models.GetUserByEmail(db, user.Email)
-	//if
-	var us *models.User
-	if us, _ = models.GetUserByEmail(db, user.Email); us != nil {
-		result = append(result, us)
-	}
-	if us, _ = models.GetUserByNickname(db, user.Nickname); us != nil {
-		if len(result) != 0 && !reflect.DeepEqual(result[0],us) {
-			result = append(result, us)
-		}
-		if len(result) == 0{
-			result = append(result,us)
-		}
+	result, err := models.GetUserWithEmailOrNickname(db, user.Email, user.Nickname)
+	if err != nil {
+		log.Printf("PATH: %v, error: %v", u.Ctx.Input.URI(), err)
+		return
 	}
 	if len(result) != 0 {
 		u.Ctx.Output.SetStatus(http.StatusConflict)
@@ -53,10 +40,82 @@ func (u *UserController) Post() {
 		u.ServeJSON()
 		return
 	}
-	//fmt.Println(u.DB)
-	//fmt.Println(user)
 	models.CreateUser(db, user)
 	u.Data["json"] = user
 	u.Ctx.Output.SetStatus(http.StatusCreated)
+	u.ServeJSON()
+}
+
+
+// @Title Post
+// @Description user information
+// @Param	nickname		path 	string	true	"nickname from uri"
+// @Success 200 {object} models.User
+// @Failure 404 {object} models.Error
+// @router /:nickname/profile [get]
+func (u *UserController) ProfileGet() {
+	db := database.GetDataBase()
+	nickname := u.GetString(":nickname")
+	user := &models.User{Nickname: nickname}
+	user, err := models.GetUserByNickname(db, nickname)
+	if err != nil {
+		log.Printf("PATH: %v, error: %v", u.Ctx.Input.URI(), err)
+		return
+	}
+	if user != nil {
+		u.Data["json"] = user
+		u.Ctx.Output.SetStatus(http.StatusOK)
+		u.ServeJSON()
+		return
+	}
+	u.Data["json"] = &models.Error{"Can't find user with nickname " + nickname}
+	u.Ctx.Output.SetStatus(http.StatusNotFound)
+	u.ServeJSON()
+}
+
+// @Title Post
+// @Description user information
+// @Param	nickname		path 	string	true	"nickname from uri"
+// @Param profile body models.User true "profile"
+// @Success 200 {object} models.User
+// @Failure 404 {object} models.Error
+// @router /:nickname/profile [post]
+func (u *UserController) ProfilePost() {
+	db := database.GetDataBase()
+	nickname := u.GetString(":nickname")
+	body := u.Ctx.Input.RequestBody
+	//updateinfo := &models.User{Nickname: nickname}
+	//json.Unmarshal(body, updateinfo)
+	user, err := models.GetUserByNickname(db, nickname)
+	if user == nil {
+		u.Ctx.Output.SetStatus(http.StatusNotFound)
+		u.Data["json"] = &models.Error{"Can't find user with nickname " + nickname}
+		u.ServeJSON()
+		return
+	}
+	oldmail := user.Email
+
+	json.Unmarshal(body,user)
+	//fmt.Println(oldmail, user.Email)
+	if err != nil {
+		log.Printf("PATH: %v, error: %v", u.Ctx.Input.URI(), err)
+		return
+	}
+
+	if oldmail != user.Email {
+		if checkuser, err := models.GetUserByEmail(db, user.Email); checkuser != nil && err == nil && checkuser.Nickname != nickname {
+			u.Ctx.Output.SetStatus(http.StatusConflict)
+			u.Data["json"] = &models.Error{"This email is already registered by user: "+checkuser.Nickname}
+			u.ServeJSON()
+			return
+		}
+	}
+	err = models.UpdateUserByNickname(db, nickname, *user)
+	if err != nil {
+		log.Printf("PATH: %v, error: %v", u.Ctx.Input.URI(), err)
+		return
+	}
+	u.Data["json"] = user
+	u.Ctx.Output.SetStatus(http.StatusOK)
 	u.ServeJSON()
 }

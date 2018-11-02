@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"github.com/malefaro/technopark-db-forum/services"
 	"log"
 )
 
@@ -12,10 +13,21 @@ type User struct {
 	Nickname string `json:"nickname"`
 }
 
+func (user *User) scanUser(rows *sql.Rows) error {
+	err := rows.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
+	if err != nil {
+		log.Println("Error in scanUser:",err)
+		return err
+	}
+	return nil
+}
+
+
 func CreateUser(db *sql.DB, user *User) error {
 	_, err := db.Exec("INSERT INTO users (about, email, fullname, nickname) VALUES ($1, $2, $3, $4)", user.About, user.Email, user.Fullname, user.Nickname)
 	if err != nil {
-		log.Printf("Function: CreateUser, User: %v, Error: %v", user, err)
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, User: %v, Error: %v",funcname ,user, err)
 		return err
 	}
 	return nil
@@ -25,8 +37,14 @@ func GetUserByNickname(db *sql.DB, nick string) (*User, error) {
 	row := db.QueryRow("select * from users where nickname = $1", nick)
 	user := &User{}
 	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
-	if err != nil {
-		log.Printf("Function: GetUserByNickname, Nickname: %s, Error: %v", nick, err)
+	switch err {
+	case sql.ErrNoRows:
+		return nil, nil
+	case nil:
+		return user, nil
+	default:
+		funcname:=services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	return user, nil
@@ -36,24 +54,46 @@ func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	row := db.QueryRow("select * from users where email = $1", email)
 	user := &User{}
 	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
-	if err != nil {
-		log.Printf("Function: GetUserByEmail, Email: %s, Error: %v", email, err)
+	switch err {
+	case sql.ErrNoRows:
+		return nil, nil
+	case nil:
+		//fmt.Println("qwerty", user.Nickname, user.Email)
+		return user, nil
+	default:
+		funcname:=services.GetFunctionName()
+		log.Printf("Function: %s, Email: %s, Error: %v",funcname , email, err)
 		return nil, err
 	}
 	return user, nil
 }
 
-//func GetUsersByEmailOrNickname(db *sql.DB, email, nickname string) ([]*User, error) {
-//	result := make([]*User,0)
-//	row, err := db.Query("select * from users where email = $1 or nickname = $2", email, nickname)
-//	if err != nil {
-//		return nil, error
-//	}
-//	user := &User{}
-//	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
-//	if err != nil {
-//		log.Printf("Function: GetUserByEmail, Email: %s, Error: %v", email, err)
-//		return nil, err
-//	}
-//	return user, nil
-//}
+func GetUserWithEmailOrNickname(db *sql.DB, email,nickname string) ([]*User, error) {
+	result := make([]*User, 0)
+	rows, err := db.Query("select * from users where email = $1 or nickname = $2", email, nickname)
+	if err != nil {
+		funcname:=services.GetFunctionName()
+		log.Printf("Function: %s, Email: %s, Nickname: %s, Error: %v",funcname , email, nickname, err)
+		return result, err
+	}
+	for rows.Next() {
+		user := &User{}
+		err := user.scanUser(rows)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, user)
+	}
+	return result, nil
+}
+
+func UpdateUserByNickname(db *sql.DB, nickname string, user User) error {
+	_, err := db.Exec("update users set about = $1, email = $2, fullname = $3 where nickname =$4", user.About, user.Email, user.Fullname, nickname)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+

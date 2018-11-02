@@ -15,94 +15,111 @@
     },
     "basePath": "/api",
     "paths": {
-        "/forum/create": {
-            "get": {
+        "/user/{nickname}/create": {
+            "post": {
                 "tags": [
-                    "forum"
+                    "user"
                 ],
-                "description": "get Thread from url",
-                "operationId": "ThreadController.GetAll",
+                "description": "create user",
+                "operationId": "UserController.Post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "nickname",
+                        "description": "nickname from uri",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "profile",
+                        "description": "profile",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Thread"
+                            "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "403": {
+                        "description": ":uid is empty"
                     }
                 }
             }
         },
-        "/forum/{slug}/create": {
+        "/user/{nickname}/profile": {
             "get": {
                 "tags": [
-                    "forum"
+                    "user"
                 ],
-                "description": "get Thread from url",
-                "operationId": "ThreadController.GetAll",
+                "description": "user information",
+                "operationId": "UserController.Post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "nickname",
+                        "description": "nickname from uri",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Thread"
+                            "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "404": {
+                        "description": "{object} models.Error"
                     }
                 }
-            }
-        },
-        "/post/": {
-            "get": {
+            },
+            "post": {
                 "tags": [
-                    "post"
+                    "user"
                 ],
-                "description": "get Thread from url",
-                "operationId": "ThreadController2.GetAll2",
+                "description": "user information",
+                "operationId": "UserController.Post",
+                "parameters": [
+                    {
+                        "in": "path",
+                        "name": "nickname",
+                        "description": "nickname from uri",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "body",
+                        "name": "profile",
+                        "description": "profile",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "",
                         "schema": {
-                            "$ref": "#/definitions/models.Thread"
+                            "$ref": "#/definitions/models.User"
                         }
+                    },
+                    "404": {
+                        "description": "{object} models.Error"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "models.Object": {
-            "title": "Object",
-            "type": "object",
-            "properties": {
-                "ObjectId": {
-                    "type": "string"
-                },
-                "PlayerName": {
-                    "type": "string"
-                },
-                "Score": {
-                    "type": "integer",
-                    "format": "int64"
-                }
-            }
-        },
-        "models.Profile": {
-            "title": "Profile",
-            "type": "object",
-            "properties": {
-                "Address": {
-                    "type": "string"
-                },
-                "Age": {
-                    "type": "integer",
-                    "format": "int64"
-                },
-                "Email": {
-                    "type": "string"
-                },
-                "Gender": {
-                    "type": "string"
-                }
-            }
-        },
         "models.Thread": {
             "title": "Thread",
             "type": "object",
@@ -120,16 +137,16 @@
             "title": "User",
             "type": "object",
             "properties": {
-                "Id": {
+                "about": {
                     "type": "string"
                 },
-                "Password": {
+                "email": {
                     "type": "string"
                 },
-                "Profile": {
-                    "$ref": "#/definitions/models.Profile"
+                "fullname": {
+                    "type": "string"
                 },
-                "Username": {
+                "nickname": {
                     "type": "string"
                 }
             }
@@ -137,12 +154,8 @@
     },
     "tags": [
         {
-            "name": "forum",
-            "description": "custom controller\n"
-        },
-        {
-            "name": "post",
-            "description": "custom controller2\n"
+            "name": "user",
+            "description": "Operations about Users\n"
         }
     ]
 }

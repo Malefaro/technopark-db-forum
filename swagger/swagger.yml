@@ -11,64 +11,75 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
 basePath: /api
 paths:
-  /forum/{slug}/create:
+  /user/{nickname}/create:
+    post:
+      tags:
+      - user
+      description: create user
+      operationId: UserController.Post
+      parameters:
+      - in: path
+        name: nickname
+        description: nickname from uri
+        required: true
+        type: string
+      - in: body
+        name: profile
+        description: profile
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      responses:
+        "201":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.User'
+        "403":
+          description: :uid is empty
+  /user/{nickname}/profile:
     get:
       tags:
-      - forum
-      description: get Thread from url
-      operationId: ThreadController.GetAll
+      - user
+      description: user information
+      operationId: UserController.Post
+      parameters:
+      - in: path
+        name: nickname
+        description: nickname from uri
+        required: true
+        type: string
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Thread'
-  /forum/create:
-    get:
+            $ref: '#/definitions/models.User'
+        "404":
+          description: '{object} models.Error'
+    post:
       tags:
-      - forum
-      description: get Thread from url
-      operationId: ThreadController.GetAll
+      - user
+      description: user information
+      operationId: UserController.Post
+      parameters:
+      - in: path
+        name: nickname
+        description: nickname from uri
+        required: true
+        type: string
+      - in: body
+        name: profile
+        description: profile
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
       responses:
         "200":
           description: ""
           schema:
-            $ref: '#/definitions/models.Thread'
-  /post/:
-    get:
-      tags:
-      - post
-      description: get Thread from url
-      operationId: ThreadController2.GetAll2
-      responses:
-        "200":
-          description: ""
-          schema:
-            $ref: '#/definitions/models.Thread'
+            $ref: '#/definitions/models.User'
+        "404":
+          description: '{object} models.Error'
 definitions:
-  models.Object:
-    title: Object
-    type: object
-    properties:
-      ObjectId:
-        type: string
-      PlayerName:
-        type: string
-      Score:
-        type: integer
-        format: int64
-  models.Profile:
-    title: Profile
-    type: object
-    properties:
-      Address:
-        type: string
-      Age:
-        type: integer
-        format: int64
-      Email:
-        type: string
-      Gender:
-        type: string
   models.Thread:
     title: Thread
     type: object
@@ -82,18 +93,15 @@ definitions:
     title: User
     type: object
     properties:
-      Id:
+      about:
         type: string
-      Password:
+      email:
         type: string
-      Profile:
-        $ref: '#/definitions/models.Profile'
-      Username:
+      fullname:
+        type: string
+      nickname:
         type: string
 tags:
-- name: forum
+- name: user
   description: |
-    custom controller
-- name: post
-  description: |
-    custom controller2
+    Operations about Users

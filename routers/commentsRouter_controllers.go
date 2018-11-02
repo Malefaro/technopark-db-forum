@@ -34,4 +34,22 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "ProfileGet",
+            Router: `/:nickname/profile`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"],
+        beego.ControllerComments{
+            Method: "ProfilePost",
+            Router: `/:nickname/profile`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }
