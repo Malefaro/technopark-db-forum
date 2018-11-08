@@ -71,6 +71,7 @@ func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 func GetUserWithEmailOrNickname(db *sql.DB, email,nickname string) ([]*User, error) {
 	result := make([]*User, 0)
 	rows, err := db.Query("select * from users where email = $1 or nickname = $2", email, nickname)
+	defer rows.Close()
 	if err != nil {
 		funcname:=services.GetFunctionName()
 		log.Printf("Function: %s, Email: %s, Nickname: %s, Error: %v",funcname , email, nickname, err)

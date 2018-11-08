@@ -40,11 +40,11 @@ func init() {
 	//)
 	//beego.AddNamespace(ns)
 	ns := beego.NewNamespace("/api",
-		//beego.NSNamespace("/forum",
-		//	beego.NSInclude(
-		//		&controllers.ThreadController{DB: database.GetDataBase()},
-		//	),
-		//),
+		beego.NSNamespace("/forum",
+			beego.NSInclude(
+				&controllers.ForumController{},
+			),
+		),
 		//beego.NSNamespace("/post",
 		//	beego.NSInclude(
 		//		&controllers.ThreadController2{},

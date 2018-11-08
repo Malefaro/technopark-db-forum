@@ -4,12 +4,17 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"io/ioutil"
 	"log"
 	"sync"
 )
 
 var db *sql.DB
 var once sync.Once
+
+func init(){
+	GetDataBase()
+}
 
 func GetDataBase() *sql.DB {
 
@@ -31,4 +36,19 @@ func GetDataBase() *sql.DB {
 
 func CloseDB() {
 	db.Close()
+}
+
+func Init(filename string) {
+	bs, err := ioutil.ReadFile(filename)
+	if err != nil {
+		log.Println("Cant read file", err)
+		return
+	}
+	str := string(bs)
+	_, err = db.Exec(str)
+	if err != nil {
+		log.Println("Error while db Init Executing script", err)
+		return
+	}
+
 }

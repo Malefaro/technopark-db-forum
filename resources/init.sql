@@ -1,3 +1,6 @@
+DROP TABLE IF EXISTS Users CASCADE ;
+DROP TABLE IF EXISTS forums;
+
 CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE IF NOT EXISTS Users (
@@ -6,3 +9,13 @@ CREATE TABLE IF NOT EXISTS Users (
   fullname VARCHAR,
   nickname CITEXT COLLATE "ucs_basic" NOT NULL UNIQUE
 );
+
+CREATE TABLE forums (
+  posts INTEGER DEFAULT 0,
+	slug CITEXT PRIMARY KEY,
+	threads INTEGER DEFAULT 0,
+	title CITEXT,
+	author CITEXT REFERENCES users(nickname)
+);
+
+
