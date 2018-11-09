@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
+	"github.com/malefaro/technopark-db-forum/services"
 	"log"
 	"net/http"
 	"strconv"
@@ -156,6 +158,14 @@ func (t *ThreadController) CreateVote() {
 	t.ServeJSON()
 }
 
+func contains(s []int, e int) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
 
 // @Title GetThread by slug or id
 // @Description get Thread from url
@@ -167,7 +177,7 @@ func (t *ThreadController) CreatePosts() {
 	body := t.Ctx.Input.RequestBody
 	slug_or_id := t.GetString(":slug_or_id")
 	posts := make([]models.Post,0)
-	json.Unmarshal(body,posts)
+	json.Unmarshal(body,&posts)
 	id, err := strconv.Atoi(slug_or_id)
 	thread := &models.Thread{}
 	if err == nil {
@@ -190,22 +200,56 @@ func (t *ThreadController) CreatePosts() {
 		}
 	}
 	maxId:= 0
+	err = db.QueryRow(`SELECT MAX(id) FROM posts`).Scan(&maxId)
 	maxId++
-	for i := range posts {
-		posts[i].Thread = thread.ID
-		posts[i].Forum = thread.Forum
-		posts[i].Created = currentTime
-		user, err := models.GetUserByNickname(db, posts[i].Author)
+	ids, err := models.GetPostsIDByThreadID(db,thread.ID)
+	fmt.Println("len posts:",len(posts))
+	for i, post := range posts {
+		if post.Parent != 0 && !contains(ids,post.Parent){
+			t.Ctx.Output.SetStatus(http.StatusConflict)
+			t.Data["json"] = &models.Error{"post parent was created in another thread"}
+			t.ServeJSON()
+			return
+		}
+		post.Thread = thread.ID
+		post.Forum = thread.Forum
+		post.Created = currentTime
+		user, err := models.GetUserByNickname(db, post.Author)
 		if err != nil {
 			log.Printf("PATH: %v, error: %v", t.Ctx.Input.URI(), err)
 			return
 		}
 		if user == nil {
-			t.Data["json"] = &models.Error{"Can't find user with nickname " + nickname}
+			t.Data["json"] = &models.Error{"Can't find user with nickname " + post.Author}
 			t.Ctx.Output.SetStatus(http.StatusNotFound)
 			t.ServeJSON()
 			return
 		}
-
+		parentPathes, err := models.GetPathById(post.Parent)
+		post.Path = append(post.Path, parentPathes...)
+		post.Path = append(post.Path, maxId+i)
+		fmt.Printf("post %d: %v\n", i,post)
 	}
+	if len(posts) == 0 {
+		post := &models.Post{}
+		post.Thread = thread.ID
+		post.Forum = thread.Forum
+		post.Created = currentTime
+		db.QueryRow(`INSERT INTO posts (forum, thread, path) VALUES($1, $2, $3) RETURNING id`, post.Forum, post.Thread, pq.Array(post.Path)).Scan(&post.Id)
+	} else {
+		ids, err :=models.CreatePosts(db, posts)
+		if err != nil {
+			funcname := services.GetFunctionName()
+			log.Printf("Function: %s, Error: %v",funcname , err)
+			log.Println("_____________________________________")
+			
+		}
+		for i, id := range ids {
+			posts[i].Id = id
+		}
+	}
+	t.Ctx.Output.SetStatus(http.StatusCreated)
+	t.Data["json"] = posts
+	t.ServeJSON()
+	
 }

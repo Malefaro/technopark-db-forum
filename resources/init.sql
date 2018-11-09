@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS Users CASCADE ;
 DROP TABLE IF EXISTS forums CASCADE ;
 DROP TABLE IF EXISTS threads CASCADE;
 DROP TABLE IF EXISTS votes CASCADE ;
+DROP TABLE IF EXISTS posts CASCADE ;
 
 CREATE EXTENSION IF NOT EXISTS citext;
 
@@ -82,3 +83,14 @@ CREATE TRIGGER votes_inc_on_update AFTER UPDATE ON votes
   FOR EACH ROW EXECUTE PROCEDURE votes_inc_on_update();
 
 
+CREATE TABLE posts (
+  author    CITEXT NOT NULL REFERENCES users(nickname),
+  created   TIMESTAMP WITH TIME ZONE,
+  forum     CITEXT REFERENCES forums(slug),
+  id        SERIAL NOT NULL PRIMARY KEY,
+  isEdited  BOOLEAN	DEFAULT FALSE,
+  message   TEXT NOT NULL,
+  parent    INTEGER	DEFAULT 0,
+  thread    INTEGER	NOT NULL REFERENCES threads(id),
+  path      BIGINT ARRAY
+);
