@@ -66,7 +66,89 @@ func (f *ForumController) Details() {
 		f.ServeJSON()
 		return
 	}
+
 	f.Ctx.Output.SetStatus(http.StatusOK)
 	f.Data["json"] = forum
+	f.ServeJSON()
+}
+
+// @Title Get
+// @Description get forum
+// @Param slug path string true "identificator"
+// @Param slug body models.Thread true "thread"
+// @Success 201 {object} models.Thread
+// @Failure 404 no such user or forum
+// @Failure 409 already exists
+// @router /:slug/create [Post]
+func (f *ForumController) Create() {
+	db := database.GetDataBase()
+	forumslug := f.GetString(":slug")
+	thread := &models.Thread{Forum:forumslug}
+	body := f.Ctx.Input.RequestBody
+	json.Unmarshal(body, thread)
+	forum,_ := models.GetForumBySlug(db, thread.Forum)
+	if forum == nil {
+		f.Ctx.Output.SetStatus(http.StatusNotFound)
+		f.Data["json"] = &models.Error{"Can'f find forum with slug: "+thread.Forum}
+		f.ServeJSON()
+		return
+	}
+	user, _ := models.GetUserByNickname(db, thread.Author)
+	if user == nil {
+		f.Ctx.Output.SetStatus(http.StatusNotFound)
+		f.Data["json"] = &models.Error{"Can'f find user with nickname: "+thread.Author}
+		f.ServeJSON()
+		return
+	}
+	thread.Author = user.Nickname
+	thread.Forum = forum.Slug
+	err := models.CreateThread(db, thread)
+	if pgerr, ok := err.(*pq.Error); ok {
+		if pgerr.Code == "23505" {
+			f.Ctx.Output.SetStatus(http.StatusConflict)
+			thr, err := models.GetThreadBySlug(db, thread.Slug)
+			if err != nil { return }
+			f.Data["json"] = thr
+			f.ServeJSON()
+			return
+		}
+	}
+	f.Ctx.Output.SetStatus(http.StatusCreated)
+	f.Data["json"] = thread
+	f.ServeJSON()
+}
+
+
+// @Title Get
+// @Description get forum
+// @Param slug path string true "identificator"
+// @Param limit query number false "max count threads"
+// @Param since query string false "time"
+// @Param desc query bool false "sort"
+// @Success 200 {object} models.Thread
+// @Failure 404 no such forum
+// @router /:slug/threads [Get]
+func (f *ForumController) Threads() {
+	db := database.GetDataBase()
+	slug := f.GetString(":slug")
+	limit := f.Ctx.Input.Query("limit")
+	since := f.Ctx.Input.Query("since")
+	desc := f.Ctx.Input.Query("desc")
+	forum, _ := models.GetForumBySlug(db, slug)
+	if forum == nil {
+		f.Ctx.Output.SetStatus(http.StatusNotFound)
+		f.Data["json"] = &models.Error{"Can't find forum by slug: "+ slug}
+		f.ServeJSON()
+		return
+	}
+	threads, _ := models.GetThreadsByForum(db, slug, limit, since, desc)
+	if len(threads) == 0 {
+		f.Ctx.Output.SetStatus(http.StatusOK)
+		f.Data["json"] = threads
+		f.ServeJSON()
+		return
+	}
+	f.Ctx.Output.SetStatus(http.StatusOK)
+	f.Data["json"] = threads
 	f.ServeJSON()
 }

@@ -13,32 +13,6 @@ import (
 )
 
 func init() {
-	//ns := beego.NewNamespace("",
-	//	beego.NSNamespace("/object",
-	//		beego.NSInclude(
-	//			&controllers.ObjectController{},
-	//		),
-	//	),
-	//	beego.NSNamespace("/user",
-	//		beego.NSInclude(
-	//			&controllers.UserController{},
-	//		),
-	//	),
-	//)
-	//beego.AddNamespace(ns)
-	//ns := beego.NewNamespace("/thread",
-	//	beego.NSNamespace("/:slug_or_id",
-	//		beego.NSInclude(
-	//			&controllers.ThreadController{},
-	//		),
-	//	),
-	//	beego.NSNamespace("/test",
-	//		beego.NSInclude(
-	//			&controllers.ThreadController2{},
-	//		),
-	//	),
-	//)
-	//beego.AddNamespace(ns)
 	ns := beego.NewNamespace("/api",
 		beego.NSNamespace("/forum",
 			beego.NSInclude(
