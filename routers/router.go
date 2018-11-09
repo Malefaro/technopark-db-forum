@@ -29,11 +29,11 @@ func init() {
 		//		&controllers.ThreadController2{},
 		//	),
 		//),
-		//beego.NSNamespace("/thread",
-		//	beego.NSInclude(
-		//		&controllers.ThreadController2{},
-		//	),
-		//),
+		beego.NSNamespace("/thread",
+			beego.NSInclude(
+				&controllers.ThreadController{},
+			),
+		),
 		beego.NSNamespace("/user",
 			beego.NSInclude(
 				&controllers.UserController{},

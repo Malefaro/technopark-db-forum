@@ -146,3 +146,42 @@ func GetThreadsByForum(db *sql.DB, forumslug,limit,since,desc string) ([]*Thread
 
 	return result, nil
 }
+
+
+func UpdateThread (db *sql.DB, thread *Thread) error {
+	var err error
+	if thread.Slug == "" {
+		_, err = db.Exec("update threads set title = $1, message = $2 where id = $3", thread.Title, thread.Message, thread.ID)
+	} else {
+		_, err = db.Exec("update threads set title = $1, message = $2 where slug = $3", thread.Title, thread.Message, thread.Slug)
+	}
+	if err != nil {
+		funcname:=services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return err
+	}
+	return nil
+}
+
+func GetTreadByID(db *sql.DB, id int) (*Thread, error) {
+	rows,err := db.Query("select * from threads where id = $1", id)
+	defer rows.Close()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+	thread := &Thread{}
+	err = thread.scanThread(rows)
+	switch err {
+	case sql.ErrNoRows:
+		return nil, nil
+	case nil:
+		return thread, nil
+	default:
+		funcname:=services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+	return thread, nil
+}

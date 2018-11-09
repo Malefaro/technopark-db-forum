@@ -43,6 +43,24 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"],
+        beego.ControllerComments{
+            Method: "UpdateThread",
+            Router: `/:slug_or_id/details`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"],
+        beego.ControllerComments{
+            Method: "GetThread",
+            Router: `/:slug_or_id/details`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:UserController"],
         beego.ControllerComments{
             Method: "Post",
