@@ -94,3 +94,17 @@ CREATE TABLE posts (
   thread    INTEGER	NOT NULL REFERENCES threads(id),
   path      BIGINT ARRAY
 );
+
+
+CREATE OR REPLACE FUNCTION post_inc() RETURNS trigger AS $$
+BEGIN
+  UPDATE forums SET posts = posts + 1
+  WHERE slug = NEW.forum;
+  RETURN NEW;
+END;
+$$ language plpgsql;
+
+DROP TRIGGER IF EXISTS post_inc ON posts;
+
+CREATE TRIGGER post_inc AFTER insert ON posts
+  FOR EACH ROW EXECUTE PROCEDURE post_inc();

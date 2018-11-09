@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/services"
 	"log"
@@ -76,7 +77,7 @@ func GetPathById(id int) ([]int, error) {
 
 
 
-func CreatePosts(db *sql.DB,posts []Post) ([]int, error) {
+func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 	valueStrings := make([]string, 0, len(posts))
 	valueArgs := make([]interface{}, 0, len(posts) * 7)
 	for i, post := range posts {
@@ -87,16 +88,27 @@ func CreatePosts(db *sql.DB,posts []Post) ([]int, error) {
 		valueArgs = append(valueArgs, post.Message)
 		valueArgs = append(valueArgs, post.Parent)
 		valueArgs = append(valueArgs, post.Thread)
-		valueArgs = append(valueArgs, post.Path)
+		valueArgs = append(valueArgs, pq.Array(post.Path))
+		fmt.Println(post.Thread,post.Forum)
 	}
-	stmt := fmt.Sprintf("INSERT INTO my_sample_table (author,created,forum,message,parent,thread,path) VALUES %s returning id", strings.Join(valueStrings, ","))
+
+	stmt := fmt.Sprintf("INSERT INTO posts (author,created,forum,message,parent,thread,path) VALUES %s returning id", strings.Join(valueStrings, ","))
 	fmt.Println("stmt:",stmt)
+	fmt.Println("valueArgs", valueArgs)
 	rows, err := db.Query(stmt,valueArgs...)
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+		return []int{}, err
+	}
 	defer rows.Close()
 	result := make([]int,0)
+	fmt.Println("check after Query")
+	fmt.Println(rows)
 	for rows.Next() {
-		var id int
+		id := 0
 		err = rows.Scan(&id)
+		fmt.Println("check after scan")
 		if err != nil {
 			funcname := services.GetFunctionName()
 			log.Printf("Function: %s, Error: %v, while scaning",funcname , err)

@@ -176,7 +176,7 @@ func (t *ThreadController) CreatePosts() {
 	db := database.GetDataBase()
 	body := t.Ctx.Input.RequestBody
 	slug_or_id := t.GetString(":slug_or_id")
-	posts := make([]models.Post,0)
+	posts := make([]*models.Post,0)
 	json.Unmarshal(body,&posts)
 	id, err := strconv.Atoi(slug_or_id)
 	thread := &models.Thread{}
@@ -199,6 +199,7 @@ func (t *ThreadController) CreatePosts() {
 			return
 		}
 	}
+	fmt.Println("thread.ID",thread.ID)
 	maxId:= 0
 	err = db.QueryRow(`SELECT MAX(id) FROM posts`).Scan(&maxId)
 	maxId++
@@ -211,9 +212,12 @@ func (t *ThreadController) CreatePosts() {
 			t.ServeJSON()
 			return
 		}
+
 		post.Thread = thread.ID
 		post.Forum = thread.Forum
 		post.Created = currentTime
+		fmt.Println("post.Thread",post.Thread)
+		fmt.Println("post.Forum",post.Forum)
 		user, err := models.GetUserByNickname(db, post.Author)
 		if err != nil {
 			log.Printf("PATH: %v, error: %v", t.Ctx.Input.URI(), err)
@@ -230,6 +234,10 @@ func (t *ThreadController) CreatePosts() {
 		post.Path = append(post.Path, maxId+i)
 		fmt.Printf("post %d: %v\n", i,post)
 	}
+	fmt.Println("____________________")
+	fmt.Println("CHECK POSTS")
+	fmt.Println(posts)
+	fmt.Println("____________________")
 	if len(posts) == 0 {
 		post := &models.Post{}
 		post.Thread = thread.ID
