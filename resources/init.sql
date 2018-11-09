@@ -1,6 +1,7 @@
 DROP TABLE IF EXISTS Users CASCADE ;
 DROP TABLE IF EXISTS forums CASCADE ;
 DROP TABLE IF EXISTS threads CASCADE;
+DROP TABLE IF EXISTS votes CASCADE ;
 
 CREATE EXTENSION IF NOT EXISTS citext;
 
@@ -43,3 +44,41 @@ DROP TRIGGER IF EXISTS thread_inc ON Threads;
 
 CREATE TRIGGER thread_inc AFTER INSERT ON Threads
   FOR EACH ROW EXECUTE PROCEDURE thread_inc();
+
+
+CREATE TABLE votes (
+  nickname  CITEXT     NOT NULL REFERENCES users(nickname),
+  voice     INTEGER,
+  thread    INTEGER     NOT NULL REFERENCES threads(id),
+  UNIQUE(nickname, thread)
+);
+
+CREATE OR REPLACE FUNCTION votes_inc() RETURNS trigger AS $$
+BEGIN
+  UPDATE threads SET votes = votes + NEW.voice
+  WHERE id = NEW.thread;
+  RETURN NEW;
+END;
+$$ language plpgsql;
+
+DROP TRIGGER IF EXISTS votes_inc ON votes;
+
+CREATE TRIGGER votes_inc AFTER INSERT ON votes
+  FOR EACH ROW EXECUTE PROCEDURE votes_inc();
+
+
+
+CREATE OR REPLACE FUNCTION votes_inc_on_update() RETURNS trigger AS $$
+BEGIN
+  UPDATE threads SET votes = votes + 2*NEW.voice
+  WHERE id = NEW.thread;
+  RETURN NEW;
+END;
+$$ language plpgsql;
+
+DROP TRIGGER IF EXISTS votes_inc_on_update ON votes;
+
+CREATE TRIGGER votes_inc_on_update AFTER UPDATE ON votes
+  FOR EACH ROW EXECUTE PROCEDURE votes_inc_on_update();
+
+
