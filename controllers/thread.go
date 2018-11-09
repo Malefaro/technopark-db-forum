@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
@@ -199,13 +198,13 @@ func (t *ThreadController) CreatePosts() {
 			return
 		}
 	}
-	fmt.Println("thread.ID",thread.ID)
-	maxId:= 0
-	err = db.QueryRow(`SELECT MAX(id) FROM posts`).Scan(&maxId)
-	maxId++
+	//fmt.Println("thread.ID",thread.ID)
+	//maxId:= 0
+	//err = db.QueryRow(`SELECT MAX(id) FROM posts`).Scan(&maxId)
+	//maxId++
 	ids, err := models.GetPostsIDByThreadID(db,thread.ID)
-	fmt.Println("len posts:",len(posts))
-	for i, post := range posts {
+	//fmt.Println("len posts:",len(posts))
+	for _, post := range posts {
 		if post.Parent != 0 && !contains(ids,post.Parent){
 			t.Ctx.Output.SetStatus(http.StatusConflict)
 			t.Data["json"] = &models.Error{"post parent was created in another thread"}
@@ -216,8 +215,8 @@ func (t *ThreadController) CreatePosts() {
 		post.Thread = thread.ID
 		post.Forum = thread.Forum
 		post.Created = currentTime
-		fmt.Println("post.Thread",post.Thread)
-		fmt.Println("post.Forum",post.Forum)
+		//fmt.Println("post.Thread",post.Thread)
+		//fmt.Println("post.Forum",post.Forum)
 		user, err := models.GetUserByNickname(db, post.Author)
 		if err != nil {
 			log.Printf("PATH: %v, error: %v", t.Ctx.Input.URI(), err)
@@ -229,21 +228,21 @@ func (t *ThreadController) CreatePosts() {
 			t.ServeJSON()
 			return
 		}
-		parentPathes, err := models.GetPathById(post.Parent)
-		post.Path = append(post.Path, parentPathes...)
-		post.Path = append(post.Path, maxId+i)
-		fmt.Printf("post %d: %v\n", i,post)
+		//parentPathes, err := models.GetPathById(post.Parent)
+		//post.Path = append(post.Path, parentPathes...)
+		//post.Path = append(post.Path, maxId+i)
+		//fmt.Printf("post %d: %v\n", i,post)
 	}
-	fmt.Println("____________________")
-	fmt.Println("CHECK POSTS")
-	fmt.Println(posts)
-	fmt.Println("____________________")
+	//fmt.Println("____________________")
+	//fmt.Println("CHECK POSTS")
+	//fmt.Println(posts)
+	//fmt.Println("____________________")
 	if len(posts) == 0 {
-		post := &models.Post{}
-		post.Thread = thread.ID
-		post.Forum = thread.Forum
-		post.Created = currentTime
-		db.QueryRow(`INSERT INTO posts (forum, thread, path) VALUES($1, $2, $3) RETURNING id`, post.Forum, post.Thread, pq.Array(post.Path)).Scan(&post.Id)
+		//post := &models.Post{}
+		//post.Thread = thread.ID
+		//post.Forum = thread.Forum
+		//post.Created = currentTime
+		//db.QueryRow(`INSERT INTO posts (forum, thread, path) VALUES($1, $2, $3) RETURNING id`, post.Forum, post.Thread, pq.Array(post.Path)).Scan(&post.Id)
 	} else {
 		ids, err :=models.CreatePosts(db, posts)
 		if err != nil {

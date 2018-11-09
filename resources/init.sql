@@ -87,7 +87,7 @@ CREATE TABLE posts (
   author    CITEXT NOT NULL REFERENCES users(nickname),
   created   TIMESTAMP WITH TIME ZONE,
   forum     CITEXT REFERENCES forums(slug),
-  id        SERIAL NOT NULL PRIMARY KEY,
+  id        BIGSERIAL NOT NULL PRIMARY KEY,
   isEdited  BOOLEAN	DEFAULT FALSE,
   message   TEXT NOT NULL,
   parent    INTEGER	DEFAULT 0,
@@ -108,3 +108,16 @@ DROP TRIGGER IF EXISTS post_inc ON posts;
 
 CREATE TRIGGER post_inc AFTER insert ON posts
   FOR EACH ROW EXECUTE PROCEDURE post_inc();
+
+CREATE OR REPLACE FUNCTION add_path() RETURNS trigger
+LANGUAGE plpgsql
+AS $$BEGIN
+  NEW.path=array_append((SELECT path FROM posts WHERE id = NEW.parent), NEW.id);
+  RETURN NEW;
+END$$;
+
+CREATE TRIGGER add_path_after_insert_post
+  BEFORE INSERT
+  ON Posts
+  FOR EACH ROW
+EXECUTE PROCEDURE add_path();

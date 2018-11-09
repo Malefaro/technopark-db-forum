@@ -89,12 +89,12 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 		valueArgs = append(valueArgs, post.Parent)
 		valueArgs = append(valueArgs, post.Thread)
 		valueArgs = append(valueArgs, pq.Array(post.Path))
-		fmt.Println(post.Thread,post.Forum)
+		//fmt.Println(post.Thread,post.Forum)
 	}
 
 	stmt := fmt.Sprintf("INSERT INTO posts (author,created,forum,message,parent,thread,path) VALUES %s returning id", strings.Join(valueStrings, ","))
-	fmt.Println("stmt:",stmt)
-	fmt.Println("valueArgs", valueArgs)
+	//fmt.Println("stmt:",stmt)
+	//fmt.Println("valueArgs", valueArgs)
 	rows, err := db.Query(stmt,valueArgs...)
 	if err != nil {
 		funcname := services.GetFunctionName()
@@ -103,12 +103,12 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 	}
 	defer rows.Close()
 	result := make([]int,0)
-	fmt.Println("check after Query")
-	fmt.Println(rows)
+	//fmt.Println("check after Query")
+	//fmt.Println(rows)
 	for rows.Next() {
 		id := 0
 		err = rows.Scan(&id)
-		fmt.Println("check after scan")
+		//fmt.Println("check after scan")
 		if err != nil {
 			funcname := services.GetFunctionName()
 			log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
