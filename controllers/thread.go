@@ -133,6 +133,17 @@ func (t *ThreadController) CreateVote() {
 			return
 		}
 	}
+	user, err := models.GetUserByNickname(db, vote.Nickname)
+	if err != nil {
+		log.Printf("PATH: %v, error: %v", t.Ctx.Input.URI(), err)
+		return
+	}
+	if user == nil {
+		t.Data["json"] = &models.Error{"Can't find user with nickname " + vote.Nickname}
+		t.Ctx.Output.SetStatus(http.StatusNotFound)
+		t.ServeJSON()
+		return
+	}
 	vote.Thread = thread.ID
 	//fmt.Println("___________________________________")
 	//fmt.Println(vote)
