@@ -300,7 +300,6 @@ func (t *ThreadController) GetPosts() {
 		cmp := ""
 		addlimit := ""
 		addSince := ""
-											//thread := &models.Thread{}
 		args := make([]interface{},0,3)
 		args = append(args, thread.ID)
 		if desc == "false" || desc == "" {
@@ -321,7 +320,7 @@ func (t *ThreadController) GetPosts() {
 			args = append(args, limit)
 		}
 		querystr := fmt.Sprintf("select * from posts where thread = $1 %[1]s ORDER BY id %[2]s %[3]s",addSince, desc, addlimit)
-		fmt.Println("flat sort querystring :", querystr)
+		//fmt.Println("flat sort querystring :", querystr)
 		result, err := models.GetPosts(db,querystr,args)
 		if err != nil && err != sql.ErrNoRows{
 			return
@@ -329,8 +328,47 @@ func (t *ThreadController) GetPosts() {
 		t.Ctx.Output.SetStatus(http.StatusOK)
 		t.Data["json"] = result
 		t.ServeJSON()
+		return
 	case sort == "tree":
+		lastIndex := 1
+		cmp := ""
+		addlimit := ""
+		addSince := ""
+		args := make([]interface{},0,4)
+		if desc == "false" || desc == "" {
+			desc = "ASC"
+			cmp = ">"
 
+		} else {
+			desc = "DESC"
+			cmp = "<"
+		}
+		if since != "" {
+			addSince = fmt.Sprintf("JOIN posts AS p2 ON p1.path %s p2.path AND p2.id = $%d where p1.thread =$%d", cmp , lastIndex, lastIndex+1 )
+			lastIndex += 2
+			args = append(args, since)
+			args = append(args,thread.ID)
+		} else {
+			args = append(args, thread.ID)
+			addSince = fmt.Sprintf("where p1.thread = $%d", lastIndex)
+			lastIndex += 1
+		}
+		if limit != "" {
+			addlimit = fmt.Sprintf("limit $%d", lastIndex)
+			lastIndex += 1
+			args = append(args, limit)
+		}
+		querystr := fmt.Sprintf("select p1.* from posts as p1 %s ORDER BY path %s %s",addSince,desc, addlimit)
+		fmt.Println("tree sort querystring :", querystr)
+		fmt.Println("tree sort args", args)
+		result, err := models.GetPosts(db,querystr,args)
+		if err != nil && err != sql.ErrNoRows{
+			return
+		}
+		t.Ctx.Output.SetStatus(http.StatusOK)
+		t.Data["json"] = result
+		t.ServeJSON()
+		return
 	case sort == "parent_tree":
 
 	}
