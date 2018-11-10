@@ -382,38 +382,42 @@ func (t *ThreadController) GetPosts() {
 		return
 	case sort == "parent_tree":
 		//lastIndex := 1
-		//cmp := ""
+		cmp := ""
 		//addlimit := ""
-		//addSince := ""
+		addSince := ""
+
 		args := make([]interface{},0,4)
+		args = append(args, thread.ID)
 		if desc == "false" || desc == "" {
 			desc = "ASC"
-			//cmp = ">"
+			cmp = ">"
 
 		} else {
 			desc = "DESC"
-			//cmp = "<"
-		}
-		if since == "" {
-			since = "0"
+			cmp = "<"
 		}
 		if limit == "" {
 			limit = "ALL"
 		}
-		args = append(args, thread.ID)
 		args = append(args, limit)
-		args = append(args, since)
+		if since == "" {
+			addSince = ""
+		} else
+		{
+			addSince = fmt.Sprintf("and p1.id %s (select path[1] from posts where id = $3 )", cmp)
+			args = append(args, since)
+		}
+		//args = append(args, since)
 		querystr := fmt.Sprintf(`WITH sub AS (
-    SELECT path FROM posts 
-    WHERE parent = 0 AND thread = $1 
+    SELECT p1.id FROM posts as p1
+    WHERE p1.parent = 0 AND p1.thread = $1 %[2]s
     ORDER BY id %[1]s
-    LIMIT $2 OFFSET $3
+    LIMIT $2
     ) 
     SELECT p.author,p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread , p.path
     FROM posts p 
-    JOIN sub ON sub.path <@ p.path 
-	
-    ORDER BY p.path[1] %[1]s, p.path[1:]`,desc)
+    JOIN sub ON sub.id = p.path[1]
+    ORDER BY p.path[1] %[1]s, p.path[1:]`,desc,addSince)
 		fmt.Println("query str:", querystr)
 		fmt.Println("query args:", args)
 		result, err := models.GetPosts(db,querystr,args)
