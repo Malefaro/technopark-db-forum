@@ -7,6 +7,7 @@ import (
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/services"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -116,9 +117,37 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 		}
 		result = append(result,id)
 	}
-	fmt.Println("RESULT IDS CREATEPOSTS",result)
+	//fmt.Println("RESULT IDS CREATEPOSTS",result)
 	if err != nil {
 		return []int{},err
 	}
 	return result,nil
+}
+
+func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
+	rows, err := db.Query(querystr, args...)
+	defer rows.Close()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return []*Post{}, err
+	}
+	result := make([]*Post,0)
+	for rows.Next() {
+		post := &Post{}
+		var pathstring string
+		err = rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
+		if err != nil {
+			funcname := services.GetFunctionName()
+			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			return []*Post{}, err
+		}
+		IDs := strings.Split(pathstring[1:len(pathstring)-1], ",")
+		for _, val := range IDs {
+			item, _ := strconv.Atoi(val)
+			post.Path = append(post.Path, item)
+		}
+		result = append(result, post)
+	}
+	return result, nil
 }

@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
@@ -258,5 +260,112 @@ func (t *ThreadController) CreatePosts() {
 	t.Ctx.Output.SetStatus(http.StatusCreated)
 	t.Data["json"] = posts
 	t.ServeJSON()
-	
+}
+
+// @Title GetThread by slug or id
+// @Description get Thread from url
+// @Success 200 {object} models.Thread
+// @router /:slug_or_id/posts [get]
+func (t *ThreadController) GetPosts() {
+	db := database.GetDataBase()
+	slug_or_id := t.GetString(":slug_or_id")
+	limit := t.Ctx.Input.Query("limit")
+	since := t.Ctx.Input.Query("since")
+	sort := t.Ctx.Input.Query("sort")
+	desc := t.Ctx.Input.Query("desc")
+	id, err := strconv.Atoi(slug_or_id)
+	thread := &models.Thread{}
+	if err == nil {
+		//thread.ID = id
+		thread, err = models.GetTreadByID(db, id)
+		if thread == nil {
+			t.Ctx.Output.SetStatus(http.StatusNotFound)
+			t.Data["json"] = &models.Error{"Can't find thread with id: "+strconv.Itoa(id)}
+			t.ServeJSON()
+			return
+		}
+	} else {
+		//thread.Slug = slug_or_id
+		thread, err = models.GetThreadBySlug(db,slug_or_id)
+		if thread == nil {
+			t.Ctx.Output.SetStatus(http.StatusNotFound)
+			t.Data["json"] = &models.Error{"Can't find thread with slug: "+slug_or_id}
+			t.ServeJSON()
+			return
+		}
+	}
+	switch {
+	case sort == "flat" || sort  == "":
+		lastIndex := 2
+		cmp := ""
+		addlimit := ""
+		addSince := ""
+											//thread := &models.Thread{}
+		args := make([]interface{},0,3)
+		args = append(args, thread.ID)
+		if desc == "false" || desc == "" {
+			desc = "ASC"
+			cmp = ">"
+		} else {
+			desc = "DESC"
+			cmp = "<"
+		}
+		if since != "" {
+			addSince = fmt.Sprintf("and id " + cmp +" $%d", lastIndex )
+			lastIndex += 1
+			args = append(args, since)
+		}
+		if limit != "" {
+			addlimit = fmt.Sprintf("limit $%d", lastIndex)
+			lastIndex += 1
+			args = append(args, limit)
+		}
+		querystr := fmt.Sprintf("select * from posts where thread = $1 %[1]s ORDER BY id %[2]s %[3]s",addSince, desc, addlimit)
+		fmt.Println("flat sort querystring :", querystr)
+		result, err := models.GetPosts(db,querystr,args)
+		if err != nil && err != sql.ErrNoRows{
+			return
+		}
+		t.Ctx.Output.SetStatus(http.StatusOK)
+		t.Data["json"] = result
+		t.ServeJSON()
+	case sort == "tree":
+
+	case sort == "parent_tree":
+
+	}
+	//var req = `SELECT * FROM posts WHERE thread = ` + strconv.Itoa(thread.ID) + ` `
+	//if sort == "flat" ||  sort == "" {
+	//	if limit != "" {
+	//		if desc == "false" || desc == "" {
+	//			if since != "" {
+	//				req += `AND id >` + since + ` ORDER BY id ASC LIMIT ` + limit
+	//			} else {
+	//				req += `ORDER BY id LIMIT ` + limit
+	//			}
+	//		} else {
+	//			if since != "" {
+	//				req += `AND id <` + since + ` ORDER BY id DESC LIMIT ` + limit
+	//			} else {
+	//				req += `ORDER BY id DESC LIMIT ` + limit
+	//			}
+	//		}
+	//	} else {
+	//		if desc == "false" || desc == "" {
+	//			if since != "" {
+	//				req += `AND id >` + since + ` ORDER BY id ASC`
+	//			} else {
+	//				req += `ORDER BY id`
+	//			}
+	//		} else {
+	//			if since != "" {
+	//				req += `AND id <` + since + ` ORDER BY id DESC`
+	//			} else {
+	//				req += `ORDER BY id DESC`
+	//			}
+	//		}
+	//	}
+	////	fmt.Println(req)
+	//	return
+	//}
 }
