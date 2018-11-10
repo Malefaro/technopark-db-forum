@@ -370,8 +370,8 @@ func (t *ThreadController) GetPosts() {
 			args = append(args, limit)
 		}
 		querystr := fmt.Sprintf("select p1.* from posts as p1 %s ORDER BY path %s %s",addSince,desc, addlimit)
-		fmt.Println("tree sort querystring :", querystr)
-		fmt.Println("tree sort args", args)
+		//fmt.Println("tree sort querystring :", querystr)
+		//fmt.Println("tree sort args", args)
 		result, err := models.GetPosts(db,querystr,args)
 		if err != nil && err != sql.ErrNoRows{
 			return
@@ -381,7 +381,49 @@ func (t *ThreadController) GetPosts() {
 		t.ServeJSON()
 		return
 	case sort == "parent_tree":
+		//lastIndex := 1
+		//cmp := ""
+		//addlimit := ""
+		//addSince := ""
+		args := make([]interface{},0,4)
+		if desc == "false" || desc == "" {
+			desc = "ASC"
+			//cmp = ">"
 
+		} else {
+			desc = "DESC"
+			//cmp = "<"
+		}
+		if since == "" {
+			since = "0"
+		}
+		if limit == "" {
+			limit = "ALL"
+		}
+		args = append(args, thread.ID)
+		args = append(args, limit)
+		args = append(args, since)
+		querystr := fmt.Sprintf(`WITH sub AS (
+    SELECT path FROM posts 
+    WHERE parent = 0 AND thread = $1 
+    ORDER BY id %[1]s
+    LIMIT $2 OFFSET $3
+    ) 
+    SELECT p.author,p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread , p.path
+    FROM posts p 
+    JOIN sub ON sub.path <@ p.path 
+	
+    ORDER BY p.path[1] %[1]s, p.path[1:]`,desc)
+		fmt.Println("query str:", querystr)
+		fmt.Println("query args:", args)
+		result, err := models.GetPosts(db,querystr,args)
+		if err != nil && err != sql.ErrNoRows{
+			return
+		}
+		t.Ctx.Output.SetStatus(http.StatusOK)
+		t.Data["json"] = result
+		t.ServeJSON()
+		return
 	}
 	//var req = `SELECT * FROM posts WHERE thread = ` + strconv.Itoa(thread.ID) + ` `
 	//if sort == "flat" ||  sort == "" {
