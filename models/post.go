@@ -159,3 +159,81 @@ func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
 	}
 	return result, nil
 }
+
+
+func GetPostDetailsByID(db *sql.DB, id string) (*PostDetails, error) {
+	//rows, err := db.Query(`SELECT * FROM posts WHERE id = $1`, id)
+	rows, err := db.Query(`select * from posts as p join users as u on u.nickname = p.author
+join forums as f on p.forum = f.slug
+join threads thread on f.slug = thread.forum
+where p.id = $1`, id)
+	defer rows.Close()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+	post := &Post{}
+	user := &User{}
+	forum := &Forum{}
+	thread := &Thread{}
+	pathstring:=""
+	if rows.Next() == true {
+		err := rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring,
+			&user.About, &user.Email, &user.Fullname,&user.Nickname,
+			&forum.Posts, &forum.Slug, &forum.Threads, &forum.Title, &forum.Author,
+			&thread.Author,&thread.Created,&thread.Forum,&thread.ID,&thread.Message,&thread.Slug,&thread.Title,&thread.Votes)
+		if err != nil {
+			log.Println("Error in scanForum:", err)
+			return nil, err
+		}
+		for rows.Next() {
+			err := rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
+			if err != nil {
+				log.Println("Error in scanForum:", err)
+				return nil, err
+			}
+
+		}
+	} else {
+		return nil ,sql.ErrNoRows
+	}
+	pd := &PostDetails{}
+	pd.Post = post
+	pd.Author = user
+	pd.Forum = forum
+	pd.Thread = thread
+	return pd, nil
+}
+
+func UpdatePosts(db *sql.DB, message string, id string) (*Post,error) {
+	tx, err := db.Begin()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+	defer tx.Commit()
+	pathstring:=""
+	post := &Post{}
+	err = tx.QueryRow("select * from posts where id = $1", id).Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+	if message != "" && post.Message != message {
+		row := tx.QueryRow("update posts set message = $1, isEdited = true where id = $2 and message <> $1 returning *", message, id)
+		err = row.Scan(&post.Author, &post.Created, &post.Forum, &post.Id, &post.IsEdited, &post.Message, &post.Parent, &post.Thread, &pathstring)
+		if err != nil {
+			funcname := services.GetFunctionName()
+			log.Printf("Function: %s, Error: %v", funcname, err)
+			return nil, err
+		}
+		return post, nil
+	} else {
+		return post, err
+	}
+	return post,nil
+}
+

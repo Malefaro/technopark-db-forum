@@ -52,6 +52,42 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:PostController"],
+        beego.ControllerComments{
+            Method: "Get",
+            Router: `/:id/details`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:PostController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:PostController"],
+        beego.ControllerComments{
+            Method: "UpdatePosts",
+            Router: `/:id/details`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ServiceController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ServiceController"],
+        beego.ControllerComments{
+            Method: "Clear",
+            Router: `/clear`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ServiceController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ServiceController"],
+        beego.ControllerComments{
+            Method: "Status",
+            Router: `/status`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"] = append(beego.GlobalControllerRouter["github.com/malefaro/technopark-db-forum/controllers:ThreadController"],
         beego.ControllerComments{
             Method: "CreatePosts",

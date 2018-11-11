@@ -19,16 +19,11 @@ func init() {
 				&controllers.ForumController{},
 			),
 		),
-		//beego.NSNamespace("/post",
-		//	beego.NSInclude(
-		//		&controllers.ThreadController2{},
-		//	),
-		//),
-		//beego.NSNamespace("/service",
-		//	beego.NSInclude(
-		//		&controllers.ThreadController2{},
-		//	),
-		//),
+		beego.NSNamespace("/post",
+			beego.NSInclude(
+				&controllers.PostController{},
+			),
+		),
 		beego.NSNamespace("/thread",
 			beego.NSInclude(
 				&controllers.ThreadController{},
@@ -37,6 +32,11 @@ func init() {
 		beego.NSNamespace("/user",
 			beego.NSInclude(
 				&controllers.UserController{},
+			),
+		),
+		beego.NSNamespace("/service",
+			beego.NSInclude(
+				&controllers.ServiceController{},
 			),
 		),
 	)

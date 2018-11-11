@@ -215,8 +215,8 @@ SELECT DISTINCT u.* FROM users AS u JOIN posts AS p ON u.nickname = p.author WHE
 UNION 
 SELECT DISTINCT u.* FROM users AS u JOIN threads AS t ON u.nickname = t.author WHERE t.forum = $1 %[1]s 
 ORDER BY nickname %[2]s %[3]s`,addSince,desc, addLimit)
-	fmt.Println(queryrow)
-	fmt.Println(args)
+	//fmt.Println(queryrow)
+	//fmt.Println(args)
 	result, err = models.GetUsers(db,queryrow,args)
 	if err != nil && err != sql.ErrNoRows{
 		return
