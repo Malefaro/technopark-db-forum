@@ -1,11 +1,15 @@
 package controllers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
+	"github.com/malefaro/technopark-db-forum/services"
+	"log"
 	"net/http"
 )
 
@@ -29,7 +33,7 @@ func (f *ForumController) Post() {
 	user, _ := models.GetUserByNickname(db, forum.Author)
 	if user == nil {
 		f.Ctx.Output.SetStatus(http.StatusNotFound)
-		f.Data["json"] = &models.Error{"Can't find user with nickname "+forum.Author}
+		f.Data["json"] = &models.Error{"Can'f find user with nickname "+forum.Author}
 		f.ServeJSON()
 		return
 	}
@@ -62,7 +66,7 @@ func (f *ForumController) Details() {
 	forum , _ := models.GetForumBySlug(db, slug)
 	if forum == nil {
 		f.Ctx.Output.SetStatus(http.StatusNotFound)
-		f.Data["json"] = &models.Error{"Can't find forum by slug "+ slug}
+		f.Data["json"] = &models.Error{"Can'f find forum by slug "+ slug}
 		f.ServeJSON()
 		return
 	}
@@ -137,7 +141,7 @@ func (f *ForumController) Threads() {
 	forum, _ := models.GetForumBySlug(db, slug)
 	if forum == nil {
 		f.Ctx.Output.SetStatus(http.StatusNotFound)
-		f.Data["json"] = &models.Error{"Can't find forum by slug: "+ slug}
+		f.Data["json"] = &models.Error{"Can'f find forum by slug: "+ slug}
 		f.ServeJSON()
 		return
 	}
@@ -152,3 +156,74 @@ func (f *ForumController) Threads() {
 	f.Data["json"] = threads
 	f.ServeJSON()
 }
+
+
+// @Title Get
+// @Description get forum
+// @Param slug path string true "identificator"
+// @Param limit query number false "max count threads"
+// @Param since query string false "time"
+// @Param desc query bool false "sort"
+// @Success 200 {object} models.Thread
+// @Failure 404 no such forum
+// @router /:slug/users [Get]
+func (f *ForumController) Users() {
+	db := database.GetDataBase()
+	slug := f.GetString(":slug")
+	limit := f.Ctx.Input.Query("limit")
+	since := f.Ctx.Input.Query("since")
+	desc := f.Ctx.Input.Query("desc")
+
+	forum, err := models.GetForumBySlug(db, slug)
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return
+	}
+	if forum == nil {
+		f.Ctx.Output.SetStatus(http.StatusNotFound)
+		f.Data["json"] = &models.Error{"Can'f find forum with slug: " + slug}
+		f.ServeJSON()
+		return
+	}
+
+	result := make([]*models.User, 0)
+	args := make([]interface{},0,4)
+	args = append(args, forum.Slug)
+	lastIndex := 2
+	addLimit := ""
+	cmp := ""
+	addSince := ""
+	if desc == "true" {
+		desc = "DESC"
+		cmp = "<"
+	} else {
+		desc = "ASC"
+		cmp = ">"
+	}
+	if limit != "" {
+		addLimit = fmt.Sprintf("limit $%d",lastIndex)
+		lastIndex++
+		args = append(args, limit)
+	}
+	if since != "" {
+		addSince = fmt.Sprintf("AND u.nickname %s $%d", cmp, lastIndex)
+		args = append(args, since)
+	}
+	queryrow := fmt.Sprintf(`
+SELECT DISTINCT u.* FROM users AS u JOIN posts AS p ON u.nickname = p.author WHERE p.forum = $1 %[1]s 
+UNION 
+SELECT DISTINCT u.* FROM users AS u JOIN threads AS t ON u.nickname = t.author WHERE t.forum = $1 %[1]s 
+ORDER BY nickname %[2]s %[3]s`,addSince,desc, addLimit)
+	fmt.Println(queryrow)
+	fmt.Println(args)
+	result, err = models.GetUsers(db,queryrow,args)
+	if err != nil && err != sql.ErrNoRows{
+		return
+	}
+	f.Ctx.Output.SetStatus(http.StatusOK)
+	f.Data["json"] = result
+	f.ServeJSON()
+	return
+}
+

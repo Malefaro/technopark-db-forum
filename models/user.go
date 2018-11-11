@@ -98,3 +98,25 @@ func UpdateUserByNickname(db *sql.DB, nickname string, user User) error {
 }
 
 
+func GetUsers (db *sql.DB, querystr string, args []interface{}) ([]*User, error) {
+	rows, err := db.Query(querystr, args...)
+	defer rows.Close()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return []*User{}, err
+	}
+	result := make([]*User,0)
+	for rows.Next() {
+		user := &User{}
+		err = rows.Scan(&user.About, &user.Email, &user.Fullname,&user.Nickname)
+		if err != nil {
+			funcname := services.GetFunctionName()
+			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			return []*User{}, err
+		}
+
+		result = append(result, user)
+	}
+	return result, nil
+}

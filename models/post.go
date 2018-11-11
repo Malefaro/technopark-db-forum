@@ -90,7 +90,15 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 		valueArgs = append(valueArgs, post.Parent)
 		valueArgs = append(valueArgs, post.Thread)
 		valueArgs = append(valueArgs, pq.Array(post.Path))
-		//fmt.Println(post.Thread,post.Forum)
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
+		//fmt.Printf("POST %v %v %v CREATED at %v\n", post.Author,post.Forum, post.Thread, post.Created)
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
+		//fmt.Println("___________________________________")
 	}
 
 	stmt := fmt.Sprintf("INSERT INTO posts (author,created,forum,message,parent,thread,path) VALUES %s returning id", strings.Join(valueStrings, ","))
