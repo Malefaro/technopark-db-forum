@@ -185,6 +185,11 @@ func contains(s []int, e int) bool {
 // @router /:slug_or_id/create [post]
 func (t *ThreadController) CreatePosts() {
 	currentTime := time.Now()
+	fmt.Println("_____________________________________________________________")
+	fmt.Println("_____________________________________________________________")
+	fmt.Printf("______________________________%v______________________________\n", currentTime)
+	fmt.Println("_____________________________________________________________")
+	fmt.Println("_____________________________________________________________")
 	db := database.GetDataBase()
 	body := t.Ctx.Input.RequestBody
 	slug_or_id := t.GetString(":slug_or_id")
@@ -418,8 +423,8 @@ func (t *ThreadController) GetPosts() {
     FROM posts p 
     JOIN sub ON sub.id = p.path[1]
     ORDER BY p.path[1] %[1]s, p.path[1:]`,desc,addSince)
-		fmt.Println("query str:", querystr)
-		fmt.Println("query args:", args)
+		//fmt.Println("query str:", querystr)
+		//fmt.Println("query args:", args)
 		result, err := models.GetPosts(db,querystr,args)
 		if err != nil && err != sql.ErrNoRows{
 			return

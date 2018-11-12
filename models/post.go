@@ -179,18 +179,31 @@ where p.id = $1`, id)
 	thread := &Thread{}
 	pathstring:=""
 	if rows.Next() == true {
+		var slug sql.NullString
 		err := rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring,
 			&user.About, &user.Email, &user.Fullname,&user.Nickname,
 			&forum.Posts, &forum.Slug, &forum.Threads, &forum.Title, &forum.Author,
-			&thread.Author,&thread.Created,&thread.Forum,&thread.ID,&thread.Message,&thread.Slug,&thread.Title,&thread.Votes)
+			&thread.Author,&thread.Created,&thread.Forum,&thread.ID,&thread.Message,&slug,&thread.Title,&thread.Votes)
+		if slug.String != "" {
+			thread.Slug = slug.String
+		}
 		if err != nil {
-			log.Println("Error in scanForum:", err)
+			funcname := services.GetFunctionName()
+			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 			return nil, err
 		}
 		for rows.Next() {
-			err := rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
+			var slug sql.NullString
+			err := rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring,
+				&user.About, &user.Email, &user.Fullname,&user.Nickname,
+				&forum.Posts, &forum.Slug, &forum.Threads, &forum.Title, &forum.Author,
+				&thread.Author,&thread.Created,&thread.Forum,&thread.ID,&thread.Message,&slug,&thread.Title,&thread.Votes)
+			if slug.String != "" {
+				thread.Slug = slug.String
+			}
 			if err != nil {
-				log.Println("Error in scanForum:", err)
+				funcname := services.GetFunctionName()
+				log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 				return nil, err
 			}
 

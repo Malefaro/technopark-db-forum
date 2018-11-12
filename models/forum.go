@@ -24,6 +24,7 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 		err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 		if err != nil {
 			log.Println("Error in scanForum:", err)
+			log.Println(f)
 			return err
 		}
 		for rows.Next() {
@@ -35,6 +36,7 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 			err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 			if err != nil {
 				log.Println("Error in scanForum:", err)
+				log.Println(f)
 				return err
 			}
 		}

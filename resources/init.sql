@@ -1,8 +1,8 @@
-DROP TABLE IF EXISTS Users CASCADE ;
-DROP TABLE IF EXISTS forums CASCADE ;
-DROP TABLE IF EXISTS threads CASCADE;
-DROP TABLE IF EXISTS votes CASCADE ;
-DROP TABLE IF EXISTS posts CASCADE ;
+-- DROP TABLE IF EXISTS Users CASCADE ;
+-- DROP TABLE IF EXISTS forums CASCADE ;
+-- DROP TABLE IF EXISTS threads CASCADE;
+-- DROP TABLE IF EXISTS votes CASCADE ;
+-- DROP TABLE IF EXISTS posts CASCADE ;
 
 CREATE EXTENSION IF NOT EXISTS citext;
 
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Users (
   nickname CITEXT COLLATE "ucs_basic" NOT NULL UNIQUE
 );
 
-CREATE TABLE forums (
+CREATE TABLE IF NOT EXISTS forums (
   posts INTEGER DEFAULT 0,
 	slug CITEXT PRIMARY KEY,
 	threads INTEGER DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE forums (
 );
 
 
-CREATE TABLE threads(
+CREATE TABLE IF NOT EXISTS threads(
   author CITEXT REFERENCES users(nickname),
   created TIMESTAMP WITH TIME ZONE,
   forum CITEXT REFERENCES forums(slug),
@@ -47,7 +47,7 @@ CREATE TRIGGER thread_inc AFTER INSERT ON Threads
   FOR EACH ROW EXECUTE PROCEDURE thread_inc();
 
 
-CREATE TABLE votes (
+CREATE TABLE IF NOT EXISTS votes (
   nickname  CITEXT     NOT NULL REFERENCES users(nickname),
   voice     INTEGER,
   thread    INTEGER     NOT NULL REFERENCES threads(id),
@@ -83,9 +83,9 @@ CREATE TRIGGER votes_inc_on_update AFTER UPDATE ON votes
   FOR EACH ROW EXECUTE PROCEDURE votes_inc_on_update();
 
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
   author    CITEXT NOT NULL REFERENCES users(nickname),
-  created   TIMESTAMP WITH TIME ZONE,
+  created   TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
   forum     CITEXT REFERENCES forums(slug),
   id        BIGSERIAL NOT NULL PRIMARY KEY,
   isEdited  BOOLEAN	DEFAULT FALSE,
@@ -116,6 +116,8 @@ AS $$BEGIN
   RETURN NEW;
 END$$;
 
+DROP TRIGGER IF EXISTS add_path_after_insert_post ON posts;
+
 CREATE TRIGGER add_path_after_insert_post
   BEFORE INSERT
   ON Posts
@@ -124,23 +126,23 @@ EXECUTE PROCEDURE add_path();
 
 
 
-DROP INDEX IF EXISTS usersLowerNicknameIdx;
-DROP INDEX IF EXISTS usersLowerEmailIdx;
-DROP INDEX IF EXISTS forumsNicknameIdx;
-DROP INDEX IF EXISTS forumsSlugIdx;
-DROP INDEX IF EXISTS threadsSlugIdx;
-DROP INDEX IF EXISTS threadsAuthorIdx;
-DROP INDEX IF EXISTS threadsForumIdx;
-DROP INDEX IF EXISTS threadsForumCreatedIdx;
-DROP INDEX IF EXISTS votesUsernameThreadIdx;
-DROP INDEX IF EXISTS postsIdIdx;
-DROP INDEX IF EXISTS postsAuthorIdx;
-DROP INDEX IF EXISTS postsThreadIdx;
-DROP INDEX IF EXISTS postsCreatedIdx;
-DROP INDEX IF EXISTS postsForumIdx;
-DROP INDEX IF EXISTS postsPath1Idx;
-DROP INDEX IF EXISTS postsPath1ThreadIdx;
-DROP INDEX IF EXISTS postsThreadIdIdx;
+-- DROP INDEX IF EXISTS usersLowerNicknameIdx;
+-- DROP INDEX IF EXISTS usersLowerEmailIdx;
+-- DROP INDEX IF EXISTS forumsNicknameIdx;
+-- DROP INDEX IF EXISTS forumsSlugIdx;
+-- DROP INDEX IF EXISTS threadsSlugIdx;
+-- DROP INDEX IF EXISTS threadsAuthorIdx;
+-- DROP INDEX IF EXISTS threadsForumIdx;
+-- DROP INDEX IF EXISTS threadsForumCreatedIdx;
+-- DROP INDEX IF EXISTS votesUsernameThreadIdx;
+-- DROP INDEX IF EXISTS postsIdIdx;
+-- DROP INDEX IF EXISTS postsAuthorIdx;
+-- DROP INDEX IF EXISTS postsThreadIdx;
+-- DROP INDEX IF EXISTS postsCreatedIdx;
+-- DROP INDEX IF EXISTS postsForumIdx;
+-- DROP INDEX IF EXISTS postsPath1Idx;
+-- DROP INDEX IF EXISTS postsPath1ThreadIdx;
+-- DROP INDEX IF EXISTS postsThreadIdIdx;
 
 
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));

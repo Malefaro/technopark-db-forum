@@ -201,6 +201,11 @@ func (f *ForumController) Users() {
 		desc = "ASC"
 		cmp = ">"
 	}
+	//if since != "" {
+	//	addSince = fmt.Sprintf("AND u.nickname %s $%d", cmp, lastIndex)
+	//	args = append(args, since)
+	//	lastIndex++
+	//}
 	if limit != "" {
 		addLimit = fmt.Sprintf("limit $%d",lastIndex)
 		lastIndex++
@@ -211,10 +216,14 @@ func (f *ForumController) Users() {
 		args = append(args, since)
 	}
 	queryrow := fmt.Sprintf(`
-SELECT DISTINCT u.* FROM users AS u JOIN posts AS p ON u.nickname = p.author WHERE p.forum = $1 %[1]s 
-UNION 
-SELECT DISTINCT u.* FROM users AS u JOIN threads AS t ON u.nickname = t.author WHERE t.forum = $1 %[1]s 
+SELECT DISTINCT u.* FROM users AS u JOIN posts AS p ON u.nickname = p.author WHERE p.forum = $1 %[1]s
+UNION
+SELECT DISTINCT u.* FROM users AS u JOIN threads AS t ON u.nickname = t.author WHERE t.forum = $1 %[1]s
 ORDER BY nickname %[2]s %[3]s`,addSince,desc, addLimit)
+//	queryrow := fmt.Sprintf(`SELECT u.nickname, u.fullname, u.email, u.about
+//			FROM users fu
+//			JOIN users u ON fu.id = u.id
+//WHERE fu.forum_slug = $1 %[1]s ORDER BY nickname %[2]s %[3]s`, addSince, desc, addLimit)
 	//fmt.Println(queryrow)
 	//fmt.Println(args)
 	result, err = models.GetUsers(db,queryrow,args)
