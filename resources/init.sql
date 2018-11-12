@@ -1,8 +1,8 @@
--- DROP TABLE IF EXISTS Users CASCADE ;
--- DROP TABLE IF EXISTS forums CASCADE ;
--- DROP TABLE IF EXISTS threads CASCADE;
--- DROP TABLE IF EXISTS votes CASCADE ;
--- DROP TABLE IF EXISTS posts CASCADE ;
+DROP TABLE IF EXISTS Users CASCADE ;
+DROP TABLE IF EXISTS forums CASCADE ;
+DROP TABLE IF EXISTS threads CASCADE;
+DROP TABLE IF EXISTS votes CASCADE ;
+DROP TABLE IF EXISTS posts CASCADE ;
 
 CREATE EXTENSION IF NOT EXISTS citext;
 
@@ -126,23 +126,24 @@ EXECUTE PROCEDURE add_path();
 
 
 
--- DROP INDEX IF EXISTS usersLowerNicknameIdx;
--- DROP INDEX IF EXISTS usersLowerEmailIdx;
--- DROP INDEX IF EXISTS forumsNicknameIdx;
--- DROP INDEX IF EXISTS forumsSlugIdx;
--- DROP INDEX IF EXISTS threadsSlugIdx;
--- DROP INDEX IF EXISTS threadsAuthorIdx;
--- DROP INDEX IF EXISTS threadsForumIdx;
--- DROP INDEX IF EXISTS threadsForumCreatedIdx;
--- DROP INDEX IF EXISTS votesUsernameThreadIdx;
--- DROP INDEX IF EXISTS postsIdIdx;
--- DROP INDEX IF EXISTS postsAuthorIdx;
--- DROP INDEX IF EXISTS postsThreadIdx;
--- DROP INDEX IF EXISTS postsCreatedIdx;
--- DROP INDEX IF EXISTS postsForumIdx;
--- DROP INDEX IF EXISTS postsPath1Idx;
--- DROP INDEX IF EXISTS postsPath1ThreadIdx;
--- DROP INDEX IF EXISTS postsThreadIdIdx;
+DROP INDEX IF EXISTS usersLowerNicknameIdx;
+DROP INDEX IF EXISTS usersLowerEmailIdx;
+DROP INDEX IF EXISTS forumsNicknameIdx;
+DROP INDEX IF EXISTS forumsSlugIdx;
+DROP INDEX IF EXISTS threadsSlugIdx;
+DROP INDEX IF EXISTS threadsAuthorIdx;
+DROP INDEX IF EXISTS threadsForumIdx;
+DROP INDEX IF EXISTS threadsForumCreatedIdx;
+DROP INDEX IF EXISTS votesUsernameThreadIdx;
+DROP INDEX IF EXISTS postsIdIdx;
+DROP INDEX IF EXISTS postsAuthorIdx;
+DROP INDEX IF EXISTS postsThreadIdx;
+DROP INDEX IF EXISTS postsCreatedIdx;
+DROP INDEX IF EXISTS postsForumIdx;
+DROP INDEX IF EXISTS postsPath1Idx;
+DROP INDEX IF EXISTS postsPath1ThreadIdx;
+DROP INDEX IF EXISTS postsThreadIdIdx;
+
 
 
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));
@@ -162,3 +163,42 @@ CREATE INDEX IF NOT EXISTS postsForumIdx ON Posts (lower(forum));
 CREATE INDEX IF NOT EXISTS postsPath1Idx ON Posts ((path [1]));
 CREATE INDEX IF NOT EXISTS postsPath1ThreadIdx ON Posts (thread, (path [1]));
 CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id);
+
+
+CREATE TABLE IF NOT EXISTS Boost (
+  username CITEXT NOT NULL REFERENCES Users (nickname),
+  slug     CITEXT NOT NULL REFERENCES Forums (slug),
+  UNIQUE (username, slug)
+);
+
+
+
+CREATE OR REPLACE FUNCTION addUserToBoost()
+  RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  INSERT INTO Boost (username, slug) VALUES (NEW.author, NEW.forum)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS addUserToBoost ON posts;
+
+CREATE TRIGGER add_user_after_insert_thread
+  AFTER INSERT
+  ON Threads
+  FOR EACH ROW
+EXECUTE PROCEDURE addUserToBoost();
+
+CREATE TRIGGER add_user_after_insert_thread
+  AFTER INSERT
+  ON Posts
+  FOR EACH ROW
+EXECUTE PROCEDURE addUserToBoost();
+
+CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (LOWER(username));
+CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (LOWER(slug), LOWER(username));
+DROP INDEX IF EXISTS boostUsernameIdx;
+DROP INDEX IF EXISTS boostSlugIdx;

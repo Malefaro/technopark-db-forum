@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/malefaro/technopark-db-forum/services"
 	"log"
 )
@@ -68,6 +69,7 @@ func GetForumBySlug(db *sql.DB, slug string) (*Forum, error) {
 	err = forum.scanForum(rows)
 	switch err {
 	case sql.ErrNoRows:
+		fmt.Println("GetFourmBySlag ErrNoRows")
 		return nil, nil
 	case nil:
 		return forum, nil
