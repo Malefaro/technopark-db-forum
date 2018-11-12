@@ -16,13 +16,21 @@ type Forum struct {
 
 func (f *Forum) scanForum(rows *sql.Rows) error {
 	if rows.Next() == true {
-		err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
+		var slug sql.NullString
+		err := rows.Scan(&f.Posts, slug, &f.Threads, &f.Title, &f.Author)
+		if slug.String != "" {
+			f.Slug = slug.String
+		}
 		if err != nil {
 			log.Println("Error in scanForum:", err)
 			return err
 		}
 		for rows.Next() {
-			err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
+			var slug sql.NullString
+			err := rows.Scan(&f.Posts, slug, &f.Threads, &f.Title, &f.Author)
+			if slug.String != "" {
+				f.Slug = slug.String
+			}
 			if err != nil {
 				log.Println("Error in scanForum:", err)
 				return err

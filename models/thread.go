@@ -21,13 +21,21 @@ type Thread struct {
 
 func (t *Thread) scanThread(rows *sql.Rows) error {
 	if rows.Next() == true {
-		err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,&t.Slug,&t.Title,&t.Votes)
+		var slug sql.NullString
+		err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,&slug,&t.Title,&t.Votes)
+		if slug.String != "" {
+			t.Slug = slug.String
+		}
 		if err != nil {
 			log.Println("Error in scanThread:", err)
 			return err
 		}
 		for rows.Next() {
-			err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,&t.Slug,&t.Title,&t.Votes)
+			var slug sql.NullString
+			err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,slug,&t.Title,&t.Votes)
+			if slug.String != "" {
+				t.Slug = slug.String
+			}
 			if err != nil {
 				log.Println("Error in scanThread:", err)
 				return err
