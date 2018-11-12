@@ -48,7 +48,11 @@ func (t *Thread) scanThread(rows *sql.Rows) error {
 }
 
 func (t *Thread) scanThreads(rows *sql.Rows) error {
-	err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,&t.Slug,&t.Title,&t.Votes)
+	var slug sql.NullString
+	err := rows.Scan(&t.Author,&t.Created,&t.Forum,&t.ID,&t.Message,&slug,&t.Title,&t.Votes)
+	if slug.String != "" {
+		t.Slug = slug.String
+	}
 	if err != nil {
 		log.Println("Error in scanThreads:",err)
 		return err

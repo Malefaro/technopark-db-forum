@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Users (
   nickname CITEXT COLLATE "ucs_basic" NOT NULL UNIQUE
 );
 
-CREATE TABLE forums (
+CREATE TABLE IF NOT EXISTS forums (
   posts INTEGER DEFAULT 0,
 	slug CITEXT PRIMARY KEY,
 	threads INTEGER DEFAULT 0,
@@ -22,7 +22,7 @@ CREATE TABLE forums (
 );
 
 
-CREATE TABLE threads(
+CREATE TABLE IF NOT EXISTS threads(
   author CITEXT REFERENCES users(nickname),
   created TIMESTAMP WITH TIME ZONE,
   forum CITEXT REFERENCES forums(slug),
@@ -47,7 +47,7 @@ CREATE TRIGGER thread_inc AFTER INSERT ON Threads
   FOR EACH ROW EXECUTE PROCEDURE thread_inc();
 
 
-CREATE TABLE votes (
+CREATE TABLE IF NOT EXISTS votes (
   nickname  CITEXT     NOT NULL REFERENCES users(nickname),
   voice     INTEGER,
   thread    INTEGER     NOT NULL REFERENCES threads(id),
@@ -83,9 +83,9 @@ CREATE TRIGGER votes_inc_on_update AFTER UPDATE ON votes
   FOR EACH ROW EXECUTE PROCEDURE votes_inc_on_update();
 
 
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
   author    CITEXT NOT NULL REFERENCES users(nickname),
-  created   TIMESTAMP WITH TIME ZONE,
+  created   TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
   forum     CITEXT REFERENCES forums(slug),
   id        BIGSERIAL NOT NULL PRIMARY KEY,
   isEdited  BOOLEAN	DEFAULT FALSE,
@@ -116,6 +116,8 @@ AS $$BEGIN
   RETURN NEW;
 END$$;
 
+DROP TRIGGER IF EXISTS add_path_after_insert_post ON posts;
+
 CREATE TRIGGER add_path_after_insert_post
   BEFORE INSERT
   ON Posts
@@ -143,6 +145,7 @@ DROP INDEX IF EXISTS postsPath1ThreadIdx;
 DROP INDEX IF EXISTS postsThreadIdIdx;
 
 
+
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerEmailIdx ON Users (LOWER(email));
 CREATE INDEX IF NOT EXISTS forumsNicknameIdx ON Forums (LOWER(author));
@@ -160,3 +163,42 @@ CREATE INDEX IF NOT EXISTS postsForumIdx ON Posts (lower(forum));
 CREATE INDEX IF NOT EXISTS postsPath1Idx ON Posts ((path [1]));
 CREATE INDEX IF NOT EXISTS postsPath1ThreadIdx ON Posts (thread, (path [1]));
 CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id);
+
+
+CREATE TABLE IF NOT EXISTS Boost (
+  username CITEXT NOT NULL REFERENCES Users (nickname),
+  slug     CITEXT NOT NULL REFERENCES Forums (slug),
+  UNIQUE (username, slug)
+);
+
+
+
+CREATE OR REPLACE FUNCTION addUserToBoost()
+  RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  INSERT INTO Boost (username, slug) VALUES (NEW.author, NEW.forum)
+  ON CONFLICT DO NOTHING;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS addUserToBoost ON posts;
+
+CREATE TRIGGER add_user_after_insert_thread
+  AFTER INSERT
+  ON Threads
+  FOR EACH ROW
+EXECUTE PROCEDURE addUserToBoost();
+
+CREATE TRIGGER add_user_after_insert_thread
+  AFTER INSERT
+  ON Posts
+  FOR EACH ROW
+EXECUTE PROCEDURE addUserToBoost();
+
+CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (LOWER(username));
+CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (LOWER(slug), LOWER(username));
+DROP INDEX IF EXISTS boostUsernameIdx;
+DROP INDEX IF EXISTS boostSlugIdx;

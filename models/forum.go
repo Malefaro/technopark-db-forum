@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/malefaro/technopark-db-forum/services"
 	"log"
 )
@@ -24,6 +25,7 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 		err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 		if err != nil {
 			log.Println("Error in scanForum:", err)
+			log.Println(f)
 			return err
 		}
 		for rows.Next() {
@@ -35,6 +37,7 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 			err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 			if err != nil {
 				log.Println("Error in scanForum:", err)
+				log.Println(f)
 				return err
 			}
 		}
@@ -66,6 +69,7 @@ func GetForumBySlug(db *sql.DB, slug string) (*Forum, error) {
 	err = forum.scanForum(rows)
 	switch err {
 	case sql.ErrNoRows:
+		fmt.Println("GetFourmBySlag ErrNoRows")
 		return nil, nil
 	case nil:
 		return forum, nil
