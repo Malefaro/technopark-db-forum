@@ -163,9 +163,9 @@ func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
 
 func GetPostDetailsByID(db *sql.DB, id string) (*PostDetails, error) {
 	//rows, err := db.Query(`SELECT * FROM posts WHERE id = $1`, id)
-	rows, err := db.Query(`select * from posts as p join users as u on u.nickname = p.author
-join forums as f on p.forum = f.slug
-join threads thread on f.slug = thread.forum
+	rows, err := db.Query(`select * from posts as p join users as u on lower(u.nickname) = lower(p.author)
+join forums as f on lower(p.forum) = lower(f.slug)
+join threads thread on lower(f.slug) = lower(thread.forum)
 where p.id = $1`, id)
 	defer rows.Close()
 	if err != nil {

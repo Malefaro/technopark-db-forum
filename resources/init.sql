@@ -121,3 +121,42 @@ CREATE TRIGGER add_path_after_insert_post
   ON Posts
   FOR EACH ROW
 EXECUTE PROCEDURE add_path();
+
+
+
+DROP INDEX IF EXISTS usersLowerNicknameIdx;
+DROP INDEX IF EXISTS usersLowerEmailIdx;
+DROP INDEX IF EXISTS forumsNicknameIdx;
+DROP INDEX IF EXISTS forumsSlugIdx;
+DROP INDEX IF EXISTS threadsSlugIdx;
+DROP INDEX IF EXISTS threadsAuthorIdx;
+DROP INDEX IF EXISTS threadsForumIdx;
+DROP INDEX IF EXISTS threadsForumCreatedIdx;
+DROP INDEX IF EXISTS votesUsernameThreadIdx;
+DROP INDEX IF EXISTS postsIdIdx;
+DROP INDEX IF EXISTS postsAuthorIdx;
+DROP INDEX IF EXISTS postsThreadIdx;
+DROP INDEX IF EXISTS postsCreatedIdx;
+DROP INDEX IF EXISTS postsForumIdx;
+DROP INDEX IF EXISTS postsPath1Idx;
+DROP INDEX IF EXISTS postsPath1ThreadIdx;
+DROP INDEX IF EXISTS postsThreadIdIdx;
+
+
+CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));
+CREATE UNIQUE INDEX IF NOT EXISTS usersLowerEmailIdx ON Users (LOWER(email));
+CREATE INDEX IF NOT EXISTS forumsNicknameIdx ON Forums (LOWER(author));
+CREATE UNIQUE INDEX IF NOT EXISTS forumsSlugIdx ON Forums (LOWER(slug));
+CREATE INDEX IF NOT EXISTS threadsSlugIdx ON Threads (LOWER(slug));
+CREATE INDEX IF NOT EXISTS threadsAuthorIdx on Threads (LOWER(author));
+CREATE INDEX IF NOT EXISTS threadsForumIdx on Threads (LOWER(forum));
+CREATE INDEX IF NOT EXISTS threadsForumCreatedIdx ON Threads (LOWER(forum), created);
+CREATE INDEX IF NOT EXISTS votesUsernameThreadIdx ON Votes (nickname, thread);
+CREATE INDEX IF NOT EXISTS postsIdIdx ON Posts (id);
+CREATE INDEX IF NOT EXISTS postsAuthorIdx ON Posts (lower(author));
+CREATE INDEX IF NOT EXISTS postsThreadIdx ON Posts (thread);
+CREATE INDEX IF NOT EXISTS postsCreatedIdx ON Posts (created);
+CREATE INDEX IF NOT EXISTS postsForumIdx ON Posts (lower(forum));
+CREATE INDEX IF NOT EXISTS postsPath1Idx ON Posts ((path [1]));
+CREATE INDEX IF NOT EXISTS postsPath1ThreadIdx ON Posts (thread, (path [1]));
+CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id);
