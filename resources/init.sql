@@ -147,7 +147,7 @@ DROP INDEX IF EXISTS postsThreadIdIdx;
 
 DROP INDEX IF EXISTS boostUsernameIdx;
 DROP INDEX IF EXISTS boostSlugIdx;
-DROP INDEX IF EXISTS ThreadsIDIdx
+DROP INDEX IF EXISTS ThreadsIDIdx;
 
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));
 -- CREATE UNIQUE INDEX IF NOT EXISTS usersLowerEmailIdx ON Users (LOWER(email));
