@@ -120,8 +120,8 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int,[]time.Time, error) {
 		id := 0
 		var t time.Time
 		err = rows.Scan(&id, &t)
-		fmt.Println("__________________________________ID")
-		fmt.Println(id)
+		//fmt.Println("__________________________________ID")
+		//fmt.Println(id)
 		//fmt.Println("check after scan")
 		if err != nil {
 			funcname := services.GetFunctionName()

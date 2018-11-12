@@ -145,24 +145,28 @@ DROP INDEX IF EXISTS postsPath1ThreadIdx;
 DROP INDEX IF EXISTS postsThreadIdIdx;
 
 
+DROP INDEX IF EXISTS boostUsernameIdx;
+DROP INDEX IF EXISTS boostSlugIdx;
+DROP INDEX IF EXISTS ThreadsIDIdx
 
 CREATE UNIQUE INDEX IF NOT EXISTS usersLowerNicknameIdx ON Users (LOWER(nickname));
-CREATE UNIQUE INDEX IF NOT EXISTS usersLowerEmailIdx ON Users (LOWER(email));
-CREATE INDEX IF NOT EXISTS forumsNicknameIdx ON Forums (LOWER(author));
+-- CREATE UNIQUE INDEX IF NOT EXISTS usersLowerEmailIdx ON Users (LOWER(email));
+-- CREATE INDEX IF NOT EXISTS forumsNicknameIdx ON Forums (LOWER(author));
 CREATE UNIQUE INDEX IF NOT EXISTS forumsSlugIdx ON Forums (LOWER(slug));
-CREATE INDEX IF NOT EXISTS threadsSlugIdx ON Threads (LOWER(slug));
-CREATE INDEX IF NOT EXISTS threadsAuthorIdx on Threads (LOWER(author));
-CREATE INDEX IF NOT EXISTS threadsForumIdx on Threads (LOWER(forum));
+-- CREATE INDEX IF NOT EXISTS threadsSlugIdx ON Threads (LOWER(slug));
+-- CREATE INDEX IF NOT EXISTS threadsAuthorIdx on Threads (LOWER(author));
+-- CREATE INDEX IF NOT EXISTS threadsForumIdx on Threads (LOWER(forum));
+CREATE INDEX IF NOT EXISTS threadsIDIdx on Threads (id);
 CREATE INDEX IF NOT EXISTS threadsForumCreatedIdx ON Threads (LOWER(forum), created);
 CREATE INDEX IF NOT EXISTS votesUsernameThreadIdx ON Votes (nickname, thread);
 CREATE INDEX IF NOT EXISTS postsIdIdx ON Posts (id);
-CREATE INDEX IF NOT EXISTS postsAuthorIdx ON Posts (lower(author));
-CREATE INDEX IF NOT EXISTS postsThreadIdx ON Posts (thread);
-CREATE INDEX IF NOT EXISTS postsCreatedIdx ON Posts (created);
-CREATE INDEX IF NOT EXISTS postsForumIdx ON Posts (lower(forum));
-CREATE INDEX IF NOT EXISTS postsPath1Idx ON Posts ((path [1]));
-CREATE INDEX IF NOT EXISTS postsPath1ThreadIdx ON Posts (thread, (path [1]));
-CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id);
+-- CREATE INDEX IF NOT EXISTS postsAuthorIdx ON Posts (lower(author));
+-- CREATE INDEX IF NOT EXISTS postsThreadIdx ON Posts (thread);
+-- CREATE INDEX IF NOT EXISTS postsCreatedIdx ON Posts (created);
+-- CREATE INDEX IF NOT EXISTS postsForumIdx ON Posts (lower(forum));
+-- CREATE INDEX IF NOT EXISTS postsPath1Idx ON Posts ((path [1]));
+-- CREATE INDEX IF NOT EXISTS postsPath1ThreadIdx ON Posts (thread, (path [1]));
+CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id, created);
 
 
 CREATE TABLE IF NOT EXISTS Boost (
@@ -200,5 +204,3 @@ EXECUTE PROCEDURE addUserToBoost();
 
 CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (LOWER(username));
 CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (LOWER(slug), LOWER(username));
-DROP INDEX IF EXISTS boostUsernameIdx;
-DROP INDEX IF EXISTS boostSlugIdx;
