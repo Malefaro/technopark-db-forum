@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 // custom controller
@@ -183,7 +184,7 @@ func contains(s []int, e int) bool {
 // @Success 200 {object} models.Thread
 // @router /:slug_or_id/create [post]
 func (t *ThreadController) CreatePosts() {
-	//currentTime := time.Now()
+	currentTime := time.Now().Round(time.Microsecond)
 	//fmt.Println("_____________________________________________________________")
 	//fmt.Println("_____________________________________________________________")
 	//fmt.Printf("______________________________%v______________________________\n", currentTime)
@@ -231,7 +232,7 @@ func (t *ThreadController) CreatePosts() {
 
 		post.Thread = thread.ID
 		post.Forum = thread.Forum
-		//post.Created = currentTime
+		post.Created = currentTime
 		//fmt.Println("post.Thread",post.Thread)
 		//fmt.Println("post.Forum",post.Forum)
 		user, err := models.GetUserByNickname(db, post.Author)
@@ -261,7 +262,7 @@ func (t *ThreadController) CreatePosts() {
 		//post.Created = currentTime
 		//db.QueryRow(`INSERT INTO posts (forum, thread, path) VALUES($1, $2, $3) RETURNING id`, post.Forum, post.Thread, pq.Array(post.Path)).Scan(&post.Id)
 	} else {
-		ids,times, err :=models.CreatePosts(db, posts)
+		ids, err :=models.CreatePosts(db, posts)
 		if err != nil {
 			funcname := services.GetFunctionName()
 			log.Printf("Function: %s, Error: %v",funcname , err)
@@ -269,7 +270,7 @@ func (t *ThreadController) CreatePosts() {
 			
 		}
 		for i, ID := range ids {
-			posts[i].Created = times[i]
+			//posts[i].Created = times[i]
 			posts[i].Id = ID
 		}
 	}
