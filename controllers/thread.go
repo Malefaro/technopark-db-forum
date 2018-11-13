@@ -262,7 +262,7 @@ func (t *ThreadController) CreatePosts() {
 		//post.Created = currentTime
 		//db.QueryRow(`INSERT INTO posts (forum, thread, path) VALUES($1, $2, $3) RETURNING id`, post.Forum, post.Thread, pq.Array(post.Path)).Scan(&post.Id)
 	} else {
-		ids, err :=models.CreatePosts(db, posts)
+		ids,times, err :=models.CreatePosts(db, posts)
 		if err != nil {
 			funcname := services.GetFunctionName()
 			log.Printf("Function: %s, Error: %v",funcname , err)
@@ -270,7 +270,7 @@ func (t *ThreadController) CreatePosts() {
 			
 		}
 		for i, id := range ids {
-			//posts[i].Created = times[i]
+			posts[i].Created = times[i]
 			posts[i].Id = id
 		}
 	}
