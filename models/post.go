@@ -118,8 +118,8 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 	//fmt.Println(rows)
 	for rows.Next() {
 		id := 0
-		var t time.Time
-		err = rows.Scan(&id,&t)
+		//var t time.Time
+		err = rows.Scan(&id)
 		//fmt.Println("__________________________________ID")
 		//fmt.Println(id)
 		//fmt.Println("check after scan")
