@@ -184,7 +184,7 @@ func contains(s []int, e int) bool {
 // @Success 200 {object} models.Thread
 // @router /:slug_or_id/create [post]
 func (t *ThreadController) CreatePosts() {
-	currentTime := time.Now().Round(time.Microsecond)
+	currentTime := time.Now().Truncate(time.Microsecond)
 	//fmt.Println("_____________________________________________________________")
 	//fmt.Println("_____________________________________________________________")
 	//fmt.Printf("______________________________%v______________________________\n", currentTime)
