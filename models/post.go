@@ -102,7 +102,7 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 		//fmt.Println("___________________________________")
 	}
 
-	stmt := fmt.Sprintf("INSERT INTO posts (author,created,forum,message,parent,thread,path) VALUES %s returning id, created", strings.Join(valueStrings, ","))
+	stmt := fmt.Sprintf("INSERT INTO posts (author,created,forum,message,parent,thread,path) VALUES %s returning id", strings.Join(valueStrings, ","))
 	//fmt.Println("stmt:",stmt)
 	//fmt.Println("valueArgs", valueArgs)
 	rows, err := db.Query(stmt,valueArgs...)
