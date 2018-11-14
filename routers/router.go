@@ -13,7 +13,9 @@ import (
 )
 
 func init() {
+
 	ns := beego.NewNamespace("/api",
+		beego.NSBefore(controllers.Logger),
 		beego.NSNamespace("/forum",
 			beego.NSInclude(
 				&controllers.ForumController{},
@@ -39,8 +41,10 @@ func init() {
 				&controllers.ServiceController{},
 			),
 		),
+		//beego.NSAfter(controllers.AfterLogger),
 	)
 	beego.AddNamespace(ns)
+	beego.InsertFilter("*", beego.FinishRouter, controllers.AfterLogger, false)
 	//beego.Router("/", &controllers.UserController{}, "get:GetAll")
 	//beego.Router("/q", &controllers.Test{}, "get:Test")
 }

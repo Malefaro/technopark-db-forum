@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
@@ -13,7 +14,93 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"os"
+	"io"
+	// "bytes"
+	// "net/http/httptest"
 )
+
+
+type fileResponseWriter struct {
+	file  io.Writer
+	resp  http.ResponseWriter
+	multi io.Writer
+}
+
+func newFileResponseWriter(file io.Writer, resp http.ResponseWriter) http.ResponseWriter {
+	multi := io.MultiWriter(file, resp)
+	return &fileResponseWriter{
+		file:  file,
+		resp:  resp,
+		multi: multi,
+	}
+}
+
+// implement http.ResponseWriter
+// https://golang.org/pkg/net/http/#ResponseWriter
+func (w *fileResponseWriter) Header() http.Header {
+	return w.resp.Header()
+}
+
+func (w *fileResponseWriter) Write(b []byte) (int, error) {
+	return w.multi.Write(b)
+}
+
+func (w *fileResponseWriter) WriteHeader(i int) {
+	w.resp.WriteHeader(i)
+}
+
+var file,_ = os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY | os.O_TRUNC, 0666)
+
+var Logger beego.FilterFunc =func(ctx *context.Context) {
+	//file,_ := os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
+	body := ctx.Input.RequestBody
+	url := ctx.Input.URI()
+	method := ctx.Input.Method()
+	// var log bytes.Buffer
+ //    _ = io.MultiWriter(ctx.ResponseWriter, &log)
+	//body := ctx.Input.CopyBody(1000000)
+	file.WriteString(method + "\n")
+	file.WriteString(url + "\n")
+	file.Write(body)
+	file.WriteString("\n")	
+	rsp := newFileResponseWriter(file, ctx.Output.Context.ResponseWriter.ResponseWriter)
+	ctx.Output.Context.ResponseWriter.ResponseWriter = rsp
+	// file.Write(log.Bytes())
+	// file.Write([]byte("\n\n\n"))
+}
+
+var AfterLogger beego.FilterFunc = func(ctx *context.Context) {
+	//var log bytes.Buffer
+
+    //rsp := io.MultiWriter(ctx.Output.Context.ResponseWriter, &log)
+    //w := httptest.NewRecorder()
+    //fmt.Printf("AFTER: %#v\n", ctx.Output.Context.ResponseWriter.ResponseWriter)
+    //file.Write(log.Bytes())
+	// file.Write([]byte("\n\n\n\n\n"))
+	file.WriteString("\n________________________________________________\n\n\n\n\n")
+	//ctx.Output.Context.ResponseWriter.ResponseWriter.Write([]byte("\n\n\n"))
+
+	// resp, _ := http.Get(ctx.Input.URL())
+	// switch ctx.Input.Method(){
+	// case http.MethodGet:
+	// 	resp, _ := http.Get(ctx.Input.URL())
+	// 	io.MultiWriter(writers)
+	// case http.MethodPost:
+	// 	const body = "Go is a general-purpose language designed with systems programming in mind."
+	// req, err := http.NewRequest("PUT", "http://www.example.org", strings.NewReader(body))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// dump, err := httputil.DumpRequestOut(req, true)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Printf("%q", dump)
+	//}
+}
 
 // custom controller
 type ThreadController struct {
@@ -179,17 +266,19 @@ func contains(s []int, e int) bool {
 	return false
 }
 
+
 // @Title GetThread by slug or id
 // @Description get Thread from url
 // @Success 200 {object} models.Thread
 // @router /:slug_or_id/create [post]
 func (t *ThreadController) CreatePosts() {
-	currentTime := time.Now().Round(time.Microsecond)
-	//fmt.Println("_____________________________________________________________")
-	//fmt.Println("_____________________________________________________________")
-	//fmt.Printf("______________________________%v______________________________\n", currentTime)
-	//fmt.Println("_____________________________________________________________")
-	//fmt.Println("_____________________________________________________________")
+	currentTime := time.Now().Truncate(time.Microsecond)
+	//currentTime := time.Now().Round(time.Microsecond)
+	fmt.Println("_____________________________________________________________")
+	fmt.Println("_____________________________________________________________")
+	fmt.Printf("______________________________%v______________________________\n", currentTime)
+	fmt.Println("_____________________________________________________________")
+	fmt.Println("_____________________________________________________________")
 	db := database.GetDataBase()
 	body := t.Ctx.Input.RequestBody
 	slug_or_id := t.GetString(":slug_or_id")
