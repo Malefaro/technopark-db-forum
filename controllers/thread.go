@@ -60,10 +60,10 @@ var Logger beego.FilterFunc =func(ctx *context.Context) {
 	// var log bytes.Buffer
  //    _ = io.MultiWriter(ctx.ResponseWriter, &log)
 	//body := ctx.Input.CopyBody(1000000)
-	file.WriteString(method + "\n")
+	file.WriteString("________________________________________________\n"+method + "\n")
 	file.WriteString(url + "\n")
 	file.Write(body)
-	file.WriteString("\n")	
+	file.WriteString("\nRESPONSE:\n")
 	rsp := newFileResponseWriter(file, ctx.Output.Context.ResponseWriter.ResponseWriter)
 	ctx.Output.Context.ResponseWriter.ResponseWriter = rsp
 	// file.Write(log.Bytes())
@@ -274,11 +274,11 @@ func contains(s []int, e int) bool {
 func (t *ThreadController) CreatePosts() {
 	currentTime := time.Now().Truncate(time.Microsecond)
 	//currentTime := time.Now().Round(time.Microsecond)
-	fmt.Println("_____________________________________________________________")
-	fmt.Println("_____________________________________________________________")
-	fmt.Printf("______________________________%v______________________________\n", currentTime)
-	fmt.Println("_____________________________________________________________")
-	fmt.Println("_____________________________________________________________")
+	//fmt.Println("_____________________________________________________________")
+	//fmt.Println("_____________________________________________________________")
+	//fmt.Printf("______________________________%v______________________________\n", currentTime)
+	//fmt.Println("_____________________________________________________________")
+	//fmt.Println("_____________________________________________________________")
 	db := database.GetDataBase()
 	body := t.Ctx.Input.RequestBody
 	slug_or_id := t.GetString(":slug_or_id")
@@ -354,9 +354,15 @@ func (t *ThreadController) CreatePosts() {
 		ids, err :=models.CreatePosts(db, posts)
 		if err != nil {
 			funcname := services.GetFunctionName()
-			log.Printf("Function: %s, Error: %v",funcname , err)
 			log.Println("_____________________________________")
-			
+			log.Println("_____________________________________")
+			log.Println("_____________________________________")
+			log.Println(t.Ctx.Input.URI())
+			log.Printf("Function: %s, Error: %v",funcname , err)
+			log.Println(string(t.Ctx.Input.RequestBody))
+			log.Println("_____________________________________")
+			log.Println("_____________________________________")
+			log.Println("_____________________________________")
 		}
 		for i, ID := range ids {
 			//posts[i].Created = times[i]
