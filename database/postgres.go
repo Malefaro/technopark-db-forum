@@ -23,6 +23,7 @@ func GetDataBase() *sql.DB {
 		dbinf := fmt.Sprintf("user=%s password=%s dbname=%s host=127.0.0.1 port=5432 sslmode=disable", "kexibq", "kexibq", "forumdb")
 		var err error
 		db, err = sql.Open("postgres", dbinf)
+		db.SetMaxOpenConns(8)
 		if err != nil {
 			log.Println("Can't connect to database", err)
 		}

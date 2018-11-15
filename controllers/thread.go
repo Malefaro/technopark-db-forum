@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
@@ -14,93 +13,91 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-	"os"
-	"io"
 	// "bytes"
 	// "net/http/httptest"
 )
 
 
-type fileResponseWriter struct {
-	file  io.Writer
-	resp  http.ResponseWriter
-	multi io.Writer
-}
-
-func newFileResponseWriter(file io.Writer, resp http.ResponseWriter) http.ResponseWriter {
-	multi := io.MultiWriter(file, resp)
-	return &fileResponseWriter{
-		file:  file,
-		resp:  resp,
-		multi: multi,
-	}
-}
-
-// implement http.ResponseWriter
-// https://golang.org/pkg/net/http/#ResponseWriter
-func (w *fileResponseWriter) Header() http.Header {
-	return w.resp.Header()
-}
-
-func (w *fileResponseWriter) Write(b []byte) (int, error) {
-	return w.multi.Write(b)
-}
-
-func (w *fileResponseWriter) WriteHeader(i int) {
-	w.resp.WriteHeader(i)
-}
-
-var file,_ = os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY | os.O_TRUNC, 0666)
-
-var Logger beego.FilterFunc =func(ctx *context.Context) {
-	//file,_ := os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
-	body := ctx.Input.RequestBody
-	url := ctx.Input.URI()
-	method := ctx.Input.Method()
-	// var log bytes.Buffer
- //    _ = io.MultiWriter(ctx.ResponseWriter, &log)
-	//body := ctx.Input.CopyBody(1000000)
-	file.WriteString("________________________________________________\n"+method + "\n")
-	file.WriteString(url + "\n")
-	file.Write(body)
-	file.WriteString("\nRESPONSE:\n")
-	rsp := newFileResponseWriter(file, ctx.Output.Context.ResponseWriter.ResponseWriter)
-	ctx.Output.Context.ResponseWriter.ResponseWriter = rsp
-	// file.Write(log.Bytes())
-	// file.Write([]byte("\n\n\n"))
-}
-
-var AfterLogger beego.FilterFunc = func(ctx *context.Context) {
-	//var log bytes.Buffer
-
-    //rsp := io.MultiWriter(ctx.Output.Context.ResponseWriter, &log)
-    //w := httptest.NewRecorder()
-    //fmt.Printf("AFTER: %#v\n", ctx.Output.Context.ResponseWriter.ResponseWriter)
-    //file.Write(log.Bytes())
-	// file.Write([]byte("\n\n\n\n\n"))
-	file.WriteString("\n________________________________________________\n\n\n\n\n")
-	//ctx.Output.Context.ResponseWriter.ResponseWriter.Write([]byte("\n\n\n"))
-
-	// resp, _ := http.Get(ctx.Input.URL())
-	// switch ctx.Input.Method(){
-	// case http.MethodGet:
-	// 	resp, _ := http.Get(ctx.Input.URL())
-	// 	io.MultiWriter(writers)
-	// case http.MethodPost:
-	// 	const body = "Go is a general-purpose language designed with systems programming in mind."
-	// req, err := http.NewRequest("PUT", "http://www.example.org", strings.NewReader(body))
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// dump, err := httputil.DumpRequestOut(req, true)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	// fmt.Printf("%q", dump)
-	//}
-}
+//type fileResponseWriter struct {
+//	file  io.Writer
+//	resp  http.ResponseWriter
+//	multi io.Writer
+//}
+//
+//func newFileResponseWriter(file io.Writer, resp http.ResponseWriter) http.ResponseWriter {
+//	multi := io.MultiWriter(file, resp)
+//	return &fileResponseWriter{
+//		file:  file,
+//		resp:  resp,
+//		multi: multi,
+//	}
+//}
+//
+//// implement http.ResponseWriter
+//// https://golang.org/pkg/net/http/#ResponseWriter
+//func (w *fileResponseWriter) Header() http.Header {
+//	return w.resp.Header()
+//}
+//
+//func (w *fileResponseWriter) Write(b []byte) (int, error) {
+//	return w.multi.Write(b)
+//}
+//
+//func (w *fileResponseWriter) WriteHeader(i int) {
+//	w.resp.WriteHeader(i)
+//}
+//
+//var file,_ = os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY | os.O_TRUNC, 0666)
+//
+//var Logger beego.FilterFunc =func(ctx *context.Context) {
+//	//file,_ := os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
+//	body := ctx.Input.RequestBody
+//	url := ctx.Input.URI()
+//	method := ctx.Input.Method()
+//	// var log bytes.Buffer
+// //    _ = io.MultiWriter(ctx.ResponseWriter, &log)
+//	//body := ctx.Input.CopyBody(1000000)
+//	file.WriteString("________________________________________________\n"+method + "\n")
+//	file.WriteString(url + "\n")
+//	file.Write(body)
+//	file.WriteString("\nRESPONSE:\n")
+//	rsp := newFileResponseWriter(file, ctx.Output.Context.ResponseWriter.ResponseWriter)
+//	ctx.Output.Context.ResponseWriter.ResponseWriter = rsp
+//	// file.Write(log.Bytes())
+//	// file.Write([]byte("\n\n\n"))
+//}
+//
+//var AfterLogger beego.FilterFunc = func(ctx *context.Context) {
+//	//var log bytes.Buffer
+//
+//    //rsp := io.MultiWriter(ctx.Output.Context.ResponseWriter, &log)
+//    //w := httptest.NewRecorder()
+//    //fmt.Printf("AFTER: %#v\n", ctx.Output.Context.ResponseWriter.ResponseWriter)
+//    //file.Write(log.Bytes())
+//	// file.Write([]byte("\n\n\n\n\n"))
+//	file.WriteString("\n________________________________________________\n\n\n\n\n")
+//	//ctx.Output.Context.ResponseWriter.ResponseWriter.Write([]byte("\n\n\n"))
+//
+//	// resp, _ := http.Get(ctx.Input.URL())
+//	// switch ctx.Input.Method(){
+//	// case http.MethodGet:
+//	// 	resp, _ := http.Get(ctx.Input.URL())
+//	// 	io.MultiWriter(writers)
+//	// case http.MethodPost:
+//	// 	const body = "Go is a general-purpose language designed with systems programming in mind."
+//	// req, err := http.NewRequest("PUT", "http://www.example.org", strings.NewReader(body))
+//	// if err != nil {
+//	// 	log.Fatal(err)
+//	// }
+//
+//	// dump, err := httputil.DumpRequestOut(req, true)
+//	// if err != nil {
+//	// 	log.Fatal(err)
+//	// }
+//
+//	// fmt.Printf("%q", dump)
+//	//}
+//}
 
 // custom controller
 type ThreadController struct {
@@ -287,7 +284,6 @@ func (t *ThreadController) CreatePosts() {
 	id, err := strconv.Atoi(slug_or_id)
 	thread := &models.Thread{}
 	if err == nil {
-		//thread.ID = id
 		thread, err = models.GetTreadByID(db, id)
 		if thread == nil {
 			t.Ctx.Output.SetStatus(http.StatusNotFound)
@@ -296,7 +292,6 @@ func (t *ThreadController) CreatePosts() {
 			return
 		}
 	} else {
-		//thread.Slug = slug_or_id
 		thread, err = models.GetThreadBySlug(db,slug_or_id)
 		if thread == nil {
 			t.Ctx.Output.SetStatus(http.StatusNotFound)
@@ -305,10 +300,6 @@ func (t *ThreadController) CreatePosts() {
 			return
 		}
 	}
-	//fmt.Println("thread.ID",thread.ID)
-	//maxId:= 0
-	//err = db.QueryRow(`SELECT MAX(id) FROM posts`).Scan(&maxId)
-	//maxId++
 	ids, err := models.GetPostsIDByThreadID(db,thread.ID)
 	//fmt.Println("len posts:",len(posts))
 	for _, post := range posts {
@@ -335,10 +326,6 @@ func (t *ThreadController) CreatePosts() {
 			t.ServeJSON()
 			return
 		}
-		//parentPathes, err := models.GetPathById(post.Parent)
-		//post.Path = append(post.Path, parentPathes...)
-		//post.Path = append(post.Path, maxId+i)
-		//fmt.Printf("post %d: %v\n", i,post)
 	}
 	//fmt.Println("____________________")
 	//fmt.Println("CHECK POSTS")
@@ -354,15 +341,15 @@ func (t *ThreadController) CreatePosts() {
 		ids, err :=models.CreatePosts(db, posts)
 		if err != nil {
 			funcname := services.GetFunctionName()
-			log.Println("_____________________________________")
-			log.Println("_____________________________________")
-			log.Println("_____________________________________")
-			log.Println(t.Ctx.Input.URI())
+			//log.Println("_____________________________________")
+			//log.Println("_____________________________________")
+			//log.Println("_____________________________________")
+			//log.Println(t.Ctx.Input.URI())
 			log.Printf("Function: %s, Error: %v",funcname , err)
-			log.Println(string(t.Ctx.Input.RequestBody))
-			log.Println("_____________________________________")
-			log.Println("_____________________________________")
-			log.Println("_____________________________________")
+			//log.Println(string(t.Ctx.Input.RequestBody))
+			//log.Println("_____________________________________")
+			//log.Println("_____________________________________")
+			//log.Println("_____________________________________")
 		}
 		for i, ID := range ids {
 			//posts[i].Created = times[i]
@@ -483,46 +470,44 @@ func (t *ThreadController) GetPosts() {
 		return
 	case sort == "parent_tree":
 		//lastIndex := 1
-		cmp := ""
+		//cmp := ""
 		//addlimit := ""
 		addSince := ""
 
-		args := make([]interface{},0,4)
+		args := make([]interface{},0,3)
 		args = append(args, thread.ID)
+		args = append(args, limit)
 		if desc == "false" || desc == "" {
 			desc = "ASC"
-			cmp = ">"
-
+			//cmp = ">"
 		} else {
 			desc = "DESC"
-			cmp = "<"
+			//cmp = "<"
 		}
-		if limit == "" {
-			limit = "ALL"
-		}
-		args = append(args, limit)
+
 		if since == "" {
-			addSince = ""
-		} else
-		{
-			addSince = fmt.Sprintf("and p1.id %s (select path[1] from posts where id = $3 )", cmp)
+			addSince = "WHERE p.rank <= $2 ORDER BY p.rank,p.path"
+		} else {
+			addSince = `JOIN sub SubPosts ON SubPosts.id =$3 
+				WHERE p.rank <= $2 +SubPosts.rank 
+					AND (p.rank > SubPosts.rank OR p.rank=SubPosts.rank and p.path >SubPosts.path) 
+				ORDER BY p.rank, p.path`
 			args = append(args, since)
 		}
-		//args = append(args, since)
-		querystr := fmt.Sprintf(`WITH sub AS (
-    SELECT p1.id FROM posts as p1
-    WHERE p1.parent = 0 AND p1.thread = $1 %[2]s
-    ORDER BY id %[1]s
-    LIMIT $2
-    ) 
-    SELECT p.author,p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread , p.path
-    FROM posts p 
-    JOIN sub ON sub.id = p.path[1]
-    ORDER BY p.path[1] %[1]s, p.path[1:]`,desc,addSince)
+		querystr := fmt.Sprintf(`
+		WITH sub AS (
+    		SELECT p.author, p.created, t.forum, p.id,p.isEdited, p.message, p.parent, p.thread,p.path,
+			dense_rank() over (ORDER BY path [1] %[1]s) AS rank
+    		FROM posts p JOIN threads t on p.thread = t.id WHERE t.id = $1
+		)
+		SELECT p.author, p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread, p.path
+		FROM sub p %[2]s
+    	`,desc,addSince)
 		//fmt.Println("query str:", querystr)
 		//fmt.Println("query args:", args)
 		result, err := models.GetPosts(db,querystr,args)
 		if err != nil && err != sql.ErrNoRows{
+			log.Println("oops ErrNoRows?", err)
 			return
 		}
 		t.Ctx.Output.SetStatus(http.StatusOK)
@@ -530,38 +515,4 @@ func (t *ThreadController) GetPosts() {
 		t.ServeJSON()
 		return
 	}
-	//var req = `SELECT * FROM posts WHERE thread = ` + strconv.Itoa(thread.ID) + ` `
-	//if sort == "flat" ||  sort == "" {
-	//	if limit != "" {
-	//		if desc == "false" || desc == "" {
-	//			if since != "" {
-	//				req += `AND id >` + since + ` ORDER BY id ASC LIMIT ` + limit
-	//			} else {
-	//				req += `ORDER BY id LIMIT ` + limit
-	//			}
-	//		} else {
-	//			if since != "" {
-	//				req += `AND id <` + since + ` ORDER BY id DESC LIMIT ` + limit
-	//			} else {
-	//				req += `ORDER BY id DESC LIMIT ` + limit
-	//			}
-	//		}
-	//	} else {
-	//		if desc == "false" || desc == "" {
-	//			if since != "" {
-	//				req += `AND id >` + since + ` ORDER BY id ASC`
-	//			} else {
-	//				req += `ORDER BY id`
-	//			}
-	//		} else {
-	//			if since != "" {
-	//				req += `AND id <` + since + ` ORDER BY id DESC`
-	//			} else {
-	//				req += `ORDER BY id DESC`
-	//			}
-	//		}
-	//	}
-	////	fmt.Println(req)
-	//	return
-	//}
 }
