@@ -155,7 +155,9 @@ DROP INDEX IF EXISTS boostUsernameIdx;
 DROP INDEX IF EXISTS boostSlugIdx;
 DROP INDEX IF EXISTS ThreadsIDIdx;
 DROP INDEX IF EXISTS postsPathIdx;
+DROP INDEX IF EXISTS threadsSlugIdx;
 
+CREATE INDEX IF NOT EXISTS threadsSlugIdx on Threads (slug);
 CREATE INDEX IF NOT EXISTS threadsForumCreatedIdx ON Threads (forum, created);
 CREATE INDEX IF NOT EXISTS votesUsernameThreadIdx ON Votes (nickname, thread);
 
@@ -192,5 +194,7 @@ DROP TRIGGER IF EXISTS AddUserToBoostAfterInsertOnThread ON Posts;
 CREATE TRIGGER AddUserToBoostAfterInsertOnPosts AFTER INSERT ON Posts
   FOR EACH ROW EXECUTE PROCEDURE addUserToBoost();
 
-CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (username);
+-- CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (username);
 CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (slug, username);
+
+-- DROP INDEX IF EXISTS boostUsernameIdx;

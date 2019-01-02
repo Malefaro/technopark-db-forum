@@ -372,7 +372,7 @@ func (t *ThreadController) GetPosts() {
 	since := t.Ctx.Input.Query("since")
 	sort := t.Ctx.Input.Query("sort")
 	desc := t.Ctx.Input.Query("desc")
-	fmt.Println("[GET POSTS]", t.Ctx.Input.URI())
+	//fmt.Println("[GET POSTS]", t.Ctx.Input.URI())
 	id, err := strconv.Atoi(slug_or_id)
 	thread := &models.Thread{}
 	if err == nil {
@@ -410,7 +410,7 @@ func (t *ThreadController) GetPosts() {
 			cmp = "<"
 		}
 		if since != "" {
-			addSince = fmt.Sprintf("and id " + cmp +" $%d", lastIndex )
+			addSince = fmt.Sprintf("and p.id " + cmp +" $%d", lastIndex )
 			lastIndex += 1
 			args = append(args, since)
 		}
@@ -419,7 +419,8 @@ func (t *ThreadController) GetPosts() {
 			lastIndex += 1
 			args = append(args, limit)
 		}
-		querystr := fmt.Sprintf("select * from posts where thread = $1 %[1]s ORDER BY id %[2]s %[3]s",addSince, desc, addlimit)
+		//querystr := fmt.Sprintf("select * from posts where thread = $1 %[1]s ORDER BY id %[2]s %[3]s",addSince, desc, addlimit)
+		querystr := fmt.Sprintf("select p.* from posts p join threads t on p.thread = t.id where p.thread = $1 %[1]s ORDER BY p.id %[2]s %[3]s",addSince, desc, addlimit)
 		//fmt.Println("flat sort querystring :", querystr)
 		result, err := models.GetPosts(db,querystr,args)
 		if err != nil && err != sql.ErrNoRows{
@@ -444,7 +445,7 @@ func (t *ThreadController) GetPosts() {
 			cmp = "<"
 		}
 		if since != "" {
-			addSince = fmt.Sprintf("JOIN posts AS p2 ON p1.path %s p2.path AND p2.id = $%d where p1.thread =$%d", cmp , lastIndex, lastIndex+1 )
+			addSince = fmt.Sprintf("JOIN posts AS p2 ON p1.path %s p2.path AND p2.id = $%d and p1.thread =$%d", cmp , lastIndex, lastIndex+1 )
 			lastIndex += 2
 			args = append(args, since)
 			args = append(args,thread.ID)
