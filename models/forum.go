@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+//easyjson:json
 type Forum struct {
 	Posts int `json:"posts"`
 	Slug string `json:"slug"`

@@ -12,6 +12,7 @@ import (
 	"time"
 )
 
+//easyjson:json
 type Post struct {
 	Author string `json:"author"`
 	Created time.Time `json:"created"`
