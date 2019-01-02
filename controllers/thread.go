@@ -498,7 +498,7 @@ func (t *ThreadController) GetPosts() {
 		WITH sub AS (
     		SELECT p.author, p.created, t.forum, p.id,p.isEdited, p.message, p.parent, p.thread,p.path,
 			dense_rank() over (ORDER BY path [1] %[1]s) AS rank
-    		FROM posts p JOIN threads t on p.thread = t.id WHERE t.id = $1
+    		FROM posts p JOIN threads t on p.thread= t.id WHERE t.id= $1
 		)
 		SELECT p.author, p.created, p.forum, p.id, p.isEdited, p.message, p.parent, p.thread, p.path
 		FROM sub p %[2]s
