@@ -372,6 +372,7 @@ func (t *ThreadController) GetPosts() {
 	since := t.Ctx.Input.Query("since")
 	sort := t.Ctx.Input.Query("sort")
 	desc := t.Ctx.Input.Query("desc")
+	fmt.Println("[GET POSTS]", t.Ctx.Input.URI())
 	id, err := strconv.Atoi(slug_or_id)
 	thread := &models.Thread{}
 	if err == nil {
