@@ -28,7 +28,44 @@ func (p *PostController) Get() {
 	id := p.GetString(":id")
 	related := p.Ctx.Input.Query("related")
 	infos := strings.Split(related, ",")
-	pd,err := models.GetPostDetailsByID(db, id)
+	//fmt.Println("INFOS in controller",infos)
+	//pd,err := models.GetPostDetailsByID(db, id)
+	//if err != nil && err != sql.ErrNoRows {
+	//	return
+	//}
+	//if pd == nil {
+	//	p.Ctx.Output.SetStatus(http.StatusNotFound)
+	//	p.Data["json"] = &models.Error{"Can't fild post with id: "+id}
+	//	p.ServeJSON()
+	//	return
+	//}
+
+	basequery := `select * from posts as p `
+	addUser := ""
+	addForum := ""
+	addThread := ""
+	result := &models.PostDetails{}
+	for _, v := range infos {
+		if v == "user" {
+			//result.Author = pd.Author
+			addUser = " join users as u on u.nickname = p.author "
+			basequery += addUser
+		}
+		if v == "forum" {
+			//result.Forum = pd.Forum
+			addForum = " join forums as f on p.forum = f.slug "
+			basequery += addForum
+		}
+		if v == "thread" {
+			//result.Thread = pd.Thread
+			addThread = " join threads thread on p.thread = thread.id "
+			basequery += addThread
+		}
+	}
+	basequery += "where p.id = $1"
+	//querystr := fmt.Sprintf(basequery, addUser, addForum, addThread)
+	querystr := basequery
+	pd, err  := models.GetPostDetailsByIDrework(db, querystr, infos, id)
 	if err != nil && err != sql.ErrNoRows {
 		return
 	}
@@ -38,7 +75,6 @@ func (p *PostController) Get() {
 		p.ServeJSON()
 		return
 	}
-	result := &models.PostDetails{}
 	for _, v := range infos {
 		if v == "user" {
 			result.Author = pd.Author

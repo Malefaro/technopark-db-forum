@@ -172,6 +172,70 @@ func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
 }
 
 
+func GetPostDetailsByIDrework(db *sql.DB, querystr string, info []string, id string) (*PostDetails, error) {
+	//fmt.Println("INFOS",info)
+
+	post := &Post{}
+	user := &User{}
+	forum := &Forum{}
+	thread := &Thread{}
+	pathstring:=""
+	var slug sql.NullString
+	results := make([]interface{},0,10)
+	results = append(results,&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
+	for _, v := range info {
+		if v == "user" {
+			results = append(results,&user.About, &user.Email, &user.Fullname,&user.Nickname)
+		}
+		if v == "forum" {
+			results = append(results,&forum.Posts, &forum.Slug, &forum.Threads, &forum.Title, &forum.Author)
+		}
+		if v == "thread" {
+			results = append(results,&thread.Author,&thread.Created,&thread.Forum,&thread.ID,&thread.Message,&slug,&thread.Title,&thread.Votes)
+		}
+	}
+	rows, err := db.Query(querystr, id)
+	defer rows.Close()
+	if err != nil {
+		funcname := services.GetFunctionName()
+		log.Printf("Function: %s, Error: %v",funcname , err)
+		return nil, err
+	}
+
+	if rows.Next() == true {
+		err := rows.Scan(results...)
+		if slug.String != "" {
+			thread.Slug = slug.String
+		}
+		if err != nil {
+			funcname := services.GetFunctionName()
+			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			return nil, err
+		}
+		for rows.Next() {
+			var slug sql.NullString
+			err := rows.Scan(results...)
+			if slug.String != "" {
+				thread.Slug = slug.String
+			}
+			if err != nil {
+				funcname := services.GetFunctionName()
+				log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+				return nil, err
+			}
+
+		}
+	} else {
+		return nil ,sql.ErrNoRows
+	}
+	pd := &PostDetails{}
+	pd.Post = post
+	pd.Author = user
+	pd.Forum = forum
+	pd.Thread = thread
+	return pd, nil
+}
+
 func GetPostDetailsByID(db *sql.DB, id string) (*PostDetails, error) {
 	//rows, err := db.Query(`SELECT * FROM posts WHERE id = $1`, id)
 	rows, err := db.Query(`select * from posts as p join users as u on u.nickname = p.author
