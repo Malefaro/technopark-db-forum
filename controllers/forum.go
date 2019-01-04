@@ -18,6 +18,15 @@ type ForumController struct {
 	beego.Controller
 }
 
+
+
+//func (c *ForumController) ServeJSON(){
+//	data, _ := easyjson.Marshal(c.Data["json"].(easyjson.Marshaler))
+//	easy
+//	c.Ctx.Output.Header("Content-Type", "application/json; charset=utf-8")
+//	c.Ctx.Output.Body(data)
+//}
+
 // @Title Post
 // @Description create forum
 // @Param forum body models.Forum true "profile"
