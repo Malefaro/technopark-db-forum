@@ -2,9 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
-	"github.com/malefaro/technopark-db-forum/services"
-	"log"
 )
 
 //easyjson:json
@@ -25,8 +22,8 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 		//}
 		err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 		if err != nil {
-			log.Println("Error in scanForum:", err)
-			log.Println(f)
+			//log.Println("Error in scanForum:", err)
+			//log.Println(f)
 			return err
 		}
 		for rows.Next() {
@@ -37,8 +34,8 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 			//}
 			err := rows.Scan(&f.Posts, &f.Slug, &f.Threads, &f.Title, &f.Author)
 			if err != nil {
-				log.Println("Error in scanForum:", err)
-				log.Println(f)
+				//log.Println("Error in scanForum:", err)
+				//log.Println(f)
 				return err
 			}
 		}
@@ -51,8 +48,8 @@ func (f *Forum) scanForum(rows *sql.Rows) error {
 func CreateForum(db *sql.DB, forum *Forum) error {
 	_, err := db.Exec("INSERT INTO forums (slug,title,author) VALUES ($1, $2, $3)", forum.Slug, forum.Title, forum.Author)
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Forum %v, Error: %v",funcname ,forum, err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Forum %v, Error: %v",funcname ,forum, err)
 		return err
 	}
 	return nil
@@ -62,21 +59,21 @@ func GetForumBySlug(db *sql.DB, slug string) (*Forum, error) {
 	rows,err := db.Query("select * from forums where slug = $1", slug)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	forum := &Forum{}
 	err = forum.scanForum(rows)
 	switch err {
 	case sql.ErrNoRows:
-		fmt.Println("GetFourmBySlag ErrNoRows")
+		//fmt.Println("GetFourmBySlag ErrNoRows")
 		return nil, nil
 	case nil:
 		return forum, nil
 	default:
-		funcname:=services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname:=services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	//return forum, nil

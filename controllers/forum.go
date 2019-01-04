@@ -223,7 +223,7 @@ func (f *ForumController) Users() {
 	queryrow := fmt.Sprintf(`SELECT u.about, u.email, u.fullname,u.nickname
 			FROM boost b
 			JOIN users u ON b.username = u.nickname
-WHERE b.slug = $1 %[1]s ORDER BY nickname %[2]s %[3]s`, addSince, desc, addLimit)
+and b.slug = $1 %[1]s ORDER BY nickname %[2]s %[3]s`, addSince, desc, addLimit)
 	//fmt.Println(queryrow)
 	//fmt.Println(args)
 	result, err = models.GetUsers(db,queryrow,args)

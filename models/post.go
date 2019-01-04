@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
-	"github.com/malefaro/technopark-db-forum/services"
-	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -37,16 +35,16 @@ func GetPostsIDByThreadID(db *sql.DB, threadID int) ([]int, error) {
 	result := make([]int,0)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return []int{}, err
 	}
 	for rows.Next() {
 		var id int
 		err = rows.Scan(&id)
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
 			return []int{}, err
 		}
 		result = append(result,id)
@@ -60,16 +58,16 @@ func GetPathById(id int) ([]int, error) {
 	rows, err := db.Query(`SELECT path FROM posts WHERE id = $1`, id)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
 		return []int{}, err
 	}
 	for rows.Next() {
 		var id int
 		err = rows.Scan(&id)
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
 			return []int{}, err
 		}
 		result = append(result,id)
@@ -108,8 +106,8 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 	//fmt.Println("valueArgs", valueArgs)
 	rows, err := db.Query(stmt,valueArgs...)
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
 		return []int{}, err
 		//return []int{},[]time.Time{}, err
 	}
@@ -127,8 +125,8 @@ func CreatePosts(db *sql.DB,posts []*Post) ([]int, error) {
 		//fmt.Println(id)
 		//fmt.Println("check after scan")
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("Function: %s, Error: %v, while scaning",funcname , err)
 			return []int{}, err
 			//return []int{},[]time.Time{}, err
 		}
@@ -148,8 +146,8 @@ func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
 	rows, err := db.Query(querystr, args...)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return []*Post{}, err
 	}
 	result := make([]*Post,0)
@@ -158,8 +156,8 @@ func GetPosts(db *sql.DB,querystr string, args []interface{}) ([]*Post, error) {
 		var pathstring string
 		err = rows.Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 			return []*Post{}, err
 		}
 		IDs := strings.Split(pathstring[1:len(pathstring)-1], ",")
@@ -198,8 +196,8 @@ func GetPostDetailsByIDrework(db *sql.DB, querystr string, info []string, id str
 	rows, err := db.Query(querystr, id)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 
@@ -209,8 +207,8 @@ func GetPostDetailsByIDrework(db *sql.DB, querystr string, info []string, id str
 			thread.Slug = slug.String
 		}
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 			return nil, err
 		}
 		for rows.Next() {
@@ -220,8 +218,8 @@ func GetPostDetailsByIDrework(db *sql.DB, querystr string, info []string, id str
 				thread.Slug = slug.String
 			}
 			if err != nil {
-				funcname := services.GetFunctionName()
-				log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+				//funcname := services.GetFunctionName()
+				//log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 				return nil, err
 			}
 
@@ -245,8 +243,8 @@ join threads thread on p.thread = thread.id
 where p.id = $1`, id)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	post := &Post{}
@@ -264,8 +262,8 @@ where p.id = $1`, id)
 			thread.Slug = slug.String
 		}
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 			return nil, err
 		}
 		for rows.Next() {
@@ -278,8 +276,8 @@ where p.id = $1`, id)
 				thread.Slug = slug.String
 			}
 			if err != nil {
-				funcname := services.GetFunctionName()
-				log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
+				//funcname := services.GetFunctionName()
+				//log.Printf("[SCAN] Function: %s, Error: %v",funcname , err)
 				return nil, err
 			}
 
@@ -298,8 +296,8 @@ where p.id = $1`, id)
 func UpdatePosts(db *sql.DB, message string, id string) (*Post,error) {
 	tx, err := db.Begin()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	defer tx.Commit()
@@ -307,16 +305,16 @@ func UpdatePosts(db *sql.DB, message string, id string) (*Post,error) {
 	post := &Post{}
 	err = tx.QueryRow("select * from posts where id = $1", id).Scan(&post.Author,&post.Created,&post.Forum,&post.Id,&post.IsEdited,&post.Message,&post.Parent,&post.Thread,&pathstring)
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	if message != "" && post.Message != message {
 		row := tx.QueryRow("update posts set message = $1, isEdited = true where id = $2 and message <> $1 returning *", message, id)
 		err = row.Scan(&post.Author, &post.Created, &post.Forum, &post.Id, &post.IsEdited, &post.Message, &post.Parent, &post.Thread, &pathstring)
 		if err != nil {
-			funcname := services.GetFunctionName()
-			log.Printf("Function: %s, Error: %v", funcname, err)
+			//funcname := services.GetFunctionName()
+			//log.Printf("Function: %s, Error: %v", funcname, err)
 			return nil, err
 		}
 		return post, nil

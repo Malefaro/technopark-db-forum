@@ -19,10 +19,15 @@ func init(){
 }
 
 func main() {
+	//runtime.GOMAXPROCS(2)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
+	beego.BConfig.Log.AccessLogs = false
+	//beego.BeeLogger.Close()
+	//beego.BeeLogger.Write([]byte("BLYA"))
 	beego.Run()
+
 	defer database.CloseDB()
 }

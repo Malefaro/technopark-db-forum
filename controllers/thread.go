@@ -12,7 +12,9 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
+	"github.com/astaxie/beego/context"
 	// "bytes"
 	// "net/http/httptest"
 )
@@ -98,6 +100,25 @@ import (
 //	// fmt.Printf("%q", dump)
 //	//}
 //}
+
+var Logger beego.FilterFunc =func(ctx *context.Context) {
+	//file,_ := os.OpenFile("log.log", os.O_CREATE | os.O_APPEND | os.O_WRONLY, 0666)
+	//body := ctx.Input.RequestBody
+	//fmt.Println("HELLO")
+	curtime := time.Now()
+	ctx.Input.SetData("timing",curtime)
+}
+
+var AfterLogger beego.FilterFunc = func(ctx *context.Context) {
+
+	t := ctx.Input.GetData("timing")
+	//fmt.Println("HELLO", t)
+	rt := time.Since(t.(time.Time))
+	uri := ctx.Input.URI()
+	if strings.HasPrefix(uri,"/api/thread") || strings.HasPrefix(uri,"/api/forum"){
+		fmt.Printf("URI: %v, TIME: %v.\n", uri, rt)
+	}
+}
 
 // custom controller
 type ThreadController struct {
@@ -366,6 +387,7 @@ func (t *ThreadController) CreatePosts() {
 // @Success 200 {object} models.Thread
 // @router /:slug_or_id/posts [get]
 func (t *ThreadController) GetPosts() {
+	//fmt.Println(t.Ctx.Input.URI())
 	db := database.GetDataBase()
 	slug_or_id := t.GetString(":slug_or_id")
 	limit := t.Ctx.Input.Query("limit")

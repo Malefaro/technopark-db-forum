@@ -3,8 +3,6 @@ package models
 import (
 	"database/sql"
 	"fmt"
-	"github.com/malefaro/technopark-db-forum/services"
-	"log"
 	"time"
 )
 
@@ -28,7 +26,7 @@ func (t *Thread) scanThread(rows *sql.Rows) error {
 			t.Slug = slug.String
 		}
 		if err != nil {
-			log.Println("Error in scanThread:", err)
+			//log.Println("Error in scanThread:", err)
 			return err
 		}
 		for rows.Next() {
@@ -38,7 +36,7 @@ func (t *Thread) scanThread(rows *sql.Rows) error {
 				t.Slug = slug.String
 			}
 			if err != nil {
-				log.Println("Error in scanThread:", err)
+				//log.Println("Error in scanThread:", err)
 				return err
 			}
 		}
@@ -55,7 +53,7 @@ func (t *Thread) scanThreads(rows *sql.Rows) error {
 		t.Slug = slug.String
 	}
 	if err != nil {
-		log.Println("Error in scanThreads:",err)
+		//log.Println("Error in scanThreads:",err)
 		return err
 	}
 	return nil
@@ -75,8 +73,8 @@ func CreateThread(db *sql.DB, thread *Thread) error {
 	err := db.QueryRow("insert into threads (author,created,forum,message,slug,title,votes) values ($1,$2,$3,$4,$5,$6,$7) RETURNING id",
 		thread.Author,thread.Created,thread.Forum,thread.Message,NewNullString(thread.Slug),thread.Title,thread.Votes).Scan(&thread.ID)
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Thread %v, Error: %v",funcname ,thread, err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Thread %v, Error: %v",funcname ,thread, err)
 		return err
 	}
 	return nil
@@ -86,8 +84,8 @@ func GetThreadBySlug(db *sql.DB, slug string) (*Thread,error) {
 	rows,err := db.Query("select * from threads where slug = $1", slug)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	thread := &Thread{}
@@ -98,8 +96,8 @@ func GetThreadBySlug(db *sql.DB, slug string) (*Thread,error) {
 	case nil:
 		return thread, nil
 	default:
-		funcname:=services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname:=services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 }
@@ -134,8 +132,8 @@ func GetThreadsByForum(db *sql.DB, forumslug,limit,since,desc string) ([]*Thread
 	}
 	defer rows.Close()
 	if err != nil {
-		funcname:=services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname:=services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return result, err
 	}
 	if rows.Next() == true {
@@ -169,8 +167,8 @@ func UpdateThread (db *sql.DB, thread *Thread) error {
 		_, err = db.Exec("update threads set title = $1, message = $2 where slug = $3", thread.Title, thread.Message, thread.Slug)
 	}
 	if err != nil {
-		funcname:=services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname:=services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return err
 	}
 	return nil
@@ -180,8 +178,8 @@ func GetTreadByID(db *sql.DB, id int) (*Thread, error) {
 	rows,err := db.Query("select * from threads where id = $1", id)
 	defer rows.Close()
 	if err != nil {
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	thread := &Thread{}
@@ -192,8 +190,8 @@ func GetTreadByID(db *sql.DB, id int) (*Thread, error) {
 	case nil:
 		return thread, nil
 	default:
-		funcname:=services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname:=services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return nil, err
 	}
 	return thread, nil
