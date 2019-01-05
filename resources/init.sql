@@ -161,14 +161,17 @@ CREATE INDEX IF NOT EXISTS threadsSlugIdx on Threads (slug);
 CREATE INDEX IF NOT EXISTS threadsForumCreatedIdx ON Threads (forum, created);
 CREATE INDEX IF NOT EXISTS votesUsernameThreadIdx ON Votes (nickname, thread);
 
-CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id, created);
-CREATE INDEX IF NOT EXISTS postsPathIdx ON Posts(id,(path[1]));
+-- CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, id, created);
+CREATE INDEX IF NOT EXISTS postsThreadIdIdx ON Posts(thread, created);
+CREATE INDEX IF NOT EXISTS postsPathIdx ON Posts((path[1]));
+-- CREATE INDEX IF NOT EXISTS postsPathIdx ON Posts(id,(path[1]));
 
 
 CREATE TABLE IF NOT EXISTS Boost (
   username CITEXT NOT NULL REFERENCES Users (nickname),
   slug     CITEXT NOT NULL REFERENCES Forums (slug),
   UNIQUE (username, slug)
+  --primary key (slug, username)
 );
 
 
@@ -196,5 +199,6 @@ CREATE TRIGGER AddUserToBoostAfterInsertOnPosts AFTER INSERT ON Posts
 
 -- CREATE INDEX IF NOT EXISTS boostUsernameIdx ON Boost (username);
 CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (slug, username);
+-- CREATE INDEX IF NOT EXISTS boostSlugIdx ON Boost (username, slug);
 
 -- DROP INDEX IF EXISTS boostUsernameIdx;
