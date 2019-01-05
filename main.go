@@ -5,17 +5,19 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
 	_ "github.com/malefaro/technopark-db-forum/routers"
+	"log"
+	"os"
 	"runtime"
 )
 
-//func init(){
-//	var filepath string = "resources/init.sql"
-//	if _, err := os.Stat(filepath); err == nil {
-//		database.Init(filepath)
-//	} else {
-//		log.Println("file does not exist\n", filepath)
-//	}
-//}
+func init(){
+	var filepath string = "resources/init.sql"
+	if _, err := os.Stat(filepath); err == nil {
+		database.Init(filepath)
+	} else {
+		log.Println("file does not exist\n", filepath)
+	}
+}
 
 func main() {
 	runtime.GOMAXPROCS(2)

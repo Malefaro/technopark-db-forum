@@ -65,6 +65,7 @@ func (p *PostController) Get() {
 	basequery += "where p.id = $1"
 	//querystr := fmt.Sprintf(basequery, addUser, addForum, addThread)
 	querystr := basequery
+	//fmt.Println(basequery)
 	pd, err  := models.GetPostDetailsByIDrework(db, querystr, infos, id)
 	if err != nil && err != sql.ErrNoRows {
 		return
