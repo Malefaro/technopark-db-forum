@@ -381,8 +381,9 @@ func (t *ThreadController) CreatePosts() {
 		}
 	}
 	t.Ctx.Output.SetStatus(http.StatusCreated)
-	t.Data["json"] = posts
-	t.ServeJSON()
+	//t.Data["json"] = posts
+	//t.ServeJSON()
+	serveJson(models.PostArray(posts), t.Ctx.Output)
 }
 
 // @Title GetThread by slug or id
@@ -538,8 +539,9 @@ func (t *ThreadController) GetPosts() {
 			return
 		}
 		t.Ctx.Output.SetStatus(http.StatusOK)
-		t.Data["json"] = result
-		t.ServeJSON()
+		//t.Data["json"] = result
+		//t.ServeJSON()
+		serveJson(models.PostArray(result), t.Ctx.Output)
 		return
 	}
 }

@@ -31,6 +31,9 @@ type PostDetails struct {
 	Author *User `json:"author"`
 }
 
+//easyjson:json
+type PostArray []*Post
+
 func GetPostsIDByThreadID(db *sql.DB, threadID int) ([]int, error) {
 	rows, err := db.Query("select id from posts where thread = $1", threadID)
 	result := make([]int,0)

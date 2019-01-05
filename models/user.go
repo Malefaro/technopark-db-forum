@@ -12,6 +12,10 @@ type User struct {
 	Nickname string `json:"nickname"`
 }
 
+//easyjson:json
+type UserArray []*User
+
+
 func (user *User) scanUser(rows *sql.Rows) error {
 	err := rows.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
 	if err != nil {
@@ -35,7 +39,7 @@ func CreateUser(db *sql.DB, user *User) error {
 func GetUserByNickname(db *sql.DB, nick string) (*User, error) {
 	//fmt.Println("GetUser")
 	//row := db.QueryRow("select * from users where nickname = $1", nick)
-	row := stmtGetUserByNick.QueryRow(nick)
+	row := StmtGetUserByNick.QueryRow(nick)
 	user := &User{}
 	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
 	switch err {

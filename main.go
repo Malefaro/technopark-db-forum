@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"github.com/astaxie/beego"
 	_ "github.com/lib/pq"
 	"github.com/malefaro/technopark-db-forum/database"
+	"github.com/malefaro/technopark-db-forum/models"
 	_ "github.com/malefaro/technopark-db-forum/routers"
 	"log"
 	"os"
@@ -16,6 +18,29 @@ func init(){
 		database.Init(filepath)
 	} else {
 		log.Println("file does not exist\n", filepath)
+	}
+	db := database.GetDataBase()
+	var err error
+	//fmt.Println("INIT stmt")
+	models.StmtGetForumBySlug, err = db.Prepare("select * from forums where slug = $1")
+	if err != nil {
+		fmt.Println("error while preparing", err)
+		return
+	}
+	models.StmtGetThreadByID, err = db.Prepare("select * from threads where id = $1")
+	if err != nil {
+		fmt.Println("error while preparing", err)
+		return
+	}
+	models.StmtGetThreadBySlug, err = db.Prepare("select * from threads where slug = $1")
+	if err != nil {
+		fmt.Println("error while preparing", err)
+		return
+	}
+	models.StmtGetUserByNick, err = db.Prepare("select * from users where nickname = $1")
+	if err != nil {
+		fmt.Println("error while preparing", err)
+		return
 	}
 }
 

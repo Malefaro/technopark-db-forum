@@ -83,7 +83,7 @@ func CreateThread(db *sql.DB, thread *Thread) error {
 func GetThreadBySlug(db *sql.DB, slug string) (*Thread,error) {
 	//fmt.Println("GetThreadBySlug")
 	//rows,err := db.Query("select * from threads where slug = $1", slug)
-	rows, err := stmtGetThreadBySlug.Query(slug)
+	rows, err := StmtGetThreadBySlug.Query(slug)
 	defer rows.Close()
 	if err != nil {
 		//funcname := services.GetFunctionName()
@@ -178,7 +178,7 @@ func UpdateThread (db *sql.DB, thread *Thread) error {
 
 func GetTreadByID(db *sql.DB, id int) (*Thread, error) {
 	//fmt.Println("GetThreadByID")
-	rows,err := stmtGetThreadByID.Query(id)
+	rows,err := StmtGetThreadByID.Query(id)
 	//rows,err := db.Query("select * from threads where id = $1", id)
 	defer rows.Close()
 	if err != nil {

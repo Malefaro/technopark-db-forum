@@ -2,8 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
-	"github.com/malefaro/technopark-db-forum/database"
 )
 
 //easyjson:json
@@ -15,35 +13,13 @@ type Forum struct {
 	Author string `json:"user"`
 }
 
-var stmtGetForumBySlug *sql.Stmt
-var stmtGetThreadByID *sql.Stmt
-var stmtGetThreadBySlug *sql.Stmt
-var stmtGetUserByNick *sql.Stmt
+var StmtGetForumBySlug *sql.Stmt
+var StmtGetThreadByID *sql.Stmt
+var StmtGetThreadBySlug *sql.Stmt
+var StmtGetUserByNick *sql.Stmt
 
 func init() {
-	db := database.GetDataBase()
-	var err error
-	//fmt.Println("INIT stmt")
-	stmtGetForumBySlug, err = db.Prepare("select * from forums where slug = $1")
-	if err != nil {
-		fmt.Println("error while preparing", err)
-		return
-	}
-	stmtGetThreadByID, err = db.Prepare("select * from threads where id = $1")
-	if err != nil {
-		fmt.Println("error while preparing", err)
-		return
-	}
-	stmtGetThreadBySlug, err = db.Prepare("select * from threads where slug = $1")
-	if err != nil {
-		fmt.Println("error while preparing", err)
-		return
-	}
-	stmtGetUserByNick, err = db.Prepare("select * from users where nickname = $1")
-	if err != nil {
-		fmt.Println("error while preparing", err)
-		return
-	}
+
 }
 
 func (f *Forum) scanForum(rows *sql.Rows) error {
@@ -90,7 +66,7 @@ func CreateForum(db *sql.DB, forum *Forum) error {
 
 func GetForumBySlug(db *sql.DB, slug string) (*Forum, error) {
 	//fmt.Println("GetForum")
-	rows,err := stmtGetForumBySlug.Query(slug)
+	rows,err := StmtGetForumBySlug.Query(slug)
 	//rows,err := db.Query("select * from forums where slug = $1", slug)
 	defer rows.Close()
 	if err != nil {

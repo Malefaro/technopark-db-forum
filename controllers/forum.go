@@ -255,8 +255,12 @@ and b.slug = $1 %[1]s ORDER BY nickname %[2]s %[3]s`, addSince, desc, addLimit)
 		return
 	}
 	f.Ctx.Output.SetStatus(http.StatusOK)
-	f.Data["json"] = result
-	f.ServeJSON()
+	//f.Data["json"] = result
+	//f.ServeJSON()
+	serveJson(models.UserArray(result),f.Ctx.Output)
+	//marshaldata, _ := easyjson.Marshal(models.UserArray(result))
+	//unmarhsaldata := make([]User)
+	//fmt.Println(easyjson.Unmarshal(marshaldata,))
 	return
 }
 
