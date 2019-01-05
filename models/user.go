@@ -33,7 +33,9 @@ func CreateUser(db *sql.DB, user *User) error {
 }
 
 func GetUserByNickname(db *sql.DB, nick string) (*User, error) {
-	row := db.QueryRow("select * from users where nickname = $1", nick)
+	//fmt.Println("GetUser")
+	//row := db.QueryRow("select * from users where nickname = $1", nick)
+	row := stmtGetUserByNick.QueryRow(nick)
 	user := &User{}
 	err := row.Scan(&user.About, &user.Email, &user.Fullname, &user.Nickname)
 	switch err {
