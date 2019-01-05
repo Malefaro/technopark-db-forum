@@ -8,14 +8,14 @@ import (
 	"runtime"
 )
 
-//func init(){
-//	var filepath string = "resources/init.sql"
-//	if _, err := os.Stat(filepath); err == nil {
-//		database.Init(filepath)
-//	} else {
-//		log.Println("file does not exist\n", filepath)
-//	}
-//}
+func init(){
+	var filepath string = "resources/init.sql"
+	if _, err := os.Stat(filepath); err == nil {
+		database.Init(filepath)
+	} else {
+		log.Println("file does not exist\n", filepath)
+	}
+}
 
 func main() {
 	runtime.GOMAXPROCS(2)
