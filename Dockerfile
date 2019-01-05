@@ -28,9 +28,9 @@ RUN echo "host all  all    0.0.0.0/0  md5" >> /etc/postgresql/$PGVER/main/pg_hba
 
 # And add ``listen_addresses`` to ``/etc/postgresql/$PGVER/main/postgresql.conf``
 RUN echo "listen_addresses='*'" >> /etc/postgresql/$PGVER/main/postgresql.conf
-# RUN echo "shared_buffers='200MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
-# RUN echo "effective_cache_size='500MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
-# RUN echo "work_mem='1MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
+RUN echo "shared_buffers='200MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
+RUN echo "effective_cache_size='500MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
+RUN echo "work_mem='1MB'" >> /etc/postgresql/$PGVER/main/postgresql.conf
 
 # Expose the PostgreSQL port
 EXPOSE 5432
