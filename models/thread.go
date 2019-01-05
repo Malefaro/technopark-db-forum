@@ -18,6 +18,9 @@ type Thread struct {
 	Votes int `json:"votes"`
 }
 
+//easyjson:json
+type ThreadArray []*Thread
+
 func (t *Thread) scanThread(rows *sql.Rows) error {
 	if rows.Next() == true {
 		var slug sql.NullString

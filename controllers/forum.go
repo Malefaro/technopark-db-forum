@@ -169,13 +169,15 @@ func (f *ForumController) Threads() {
 	threads, _ := models.GetThreadsByForum(db, slug, limit, since, desc)
 	if len(threads) == 0 {
 		f.Ctx.Output.SetStatus(http.StatusOK)
-		f.Data["json"] = threads
-		f.ServeJSON()
+		//f.Data["json"] = threads
+		//f.ServeJSON()
+		serveJson(models.ThreadArray(threads), f.Ctx.Output)
 		return
 	}
 	f.Ctx.Output.SetStatus(http.StatusOK)
-	f.Data["json"] = threads
-	f.ServeJSON()
+	//f.Data["json"] = threads
+	//f.ServeJSON()
+	serveJson(models.ThreadArray(threads), f.Ctx.Output)
 }
 
 
