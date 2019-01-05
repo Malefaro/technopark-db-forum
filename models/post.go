@@ -23,6 +23,7 @@ type Post struct {
 	Path []int `json:"path"`
 }
 
+//easyjson:json
 type PostDetails struct {
 	Post *Post `json:"post"`
 	Thread *Thread `json:"thread"`

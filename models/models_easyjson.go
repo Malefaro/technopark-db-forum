@@ -3,10 +3,10 @@
 package models
 
 import (
-	"encoding/json"
-	"github.com/mailru/easyjson"
-	"github.com/mailru/easyjson/jlexer"
-	"github.com/mailru/easyjson/jwriter"
+	json "encoding/json"
+	easyjson "github.com/mailru/easyjson"
+	jlexer "github.com/mailru/easyjson/jlexer"
+	jwriter "github.com/mailru/easyjson/jwriter"
 )
 
 // suppress unused package warning
@@ -376,7 +376,170 @@ func (v *Thread) UnmarshalJSON(data []byte) error {
 func (v *Thread) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels2(l, v)
 }
-func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(in *jlexer.Lexer, out *Post) {
+func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(in *jlexer.Lexer, out *PostDetails) {
+	isTopLevel := in.IsStart()
+	if in.IsNull() {
+		if isTopLevel {
+			in.Consumed()
+		}
+		in.Skip()
+		return
+	}
+	in.Delim('{')
+	for !in.IsDelim('}') {
+		key := in.UnsafeString()
+		in.WantColon()
+		if in.IsNull() {
+			in.Skip()
+			in.WantComma()
+			continue
+		}
+		switch key {
+		case "post":
+			if in.IsNull() {
+				in.Skip()
+				out.Post = nil
+			} else {
+				if out.Post == nil {
+					out.Post = new(Post)
+				}
+				if data := in.Raw(); in.Ok() {
+					in.AddError((*out.Post).UnmarshalJSON(data))
+				}
+			}
+		case "thread":
+			if in.IsNull() {
+				in.Skip()
+				out.Thread = nil
+			} else {
+				if out.Thread == nil {
+					out.Thread = new(Thread)
+				}
+				if data := in.Raw(); in.Ok() {
+					in.AddError((*out.Thread).UnmarshalJSON(data))
+				}
+			}
+		case "forum":
+			if in.IsNull() {
+				in.Skip()
+				out.Forum = nil
+			} else {
+				if out.Forum == nil {
+					out.Forum = new(Forum)
+				}
+				if data := in.Raw(); in.Ok() {
+					in.AddError((*out.Forum).UnmarshalJSON(data))
+				}
+			}
+		case "author":
+			if in.IsNull() {
+				in.Skip()
+				out.Author = nil
+			} else {
+				if out.Author == nil {
+					out.Author = new(User)
+				}
+				if data := in.Raw(); in.Ok() {
+					in.AddError((*out.Author).UnmarshalJSON(data))
+				}
+			}
+		default:
+			in.SkipRecursive()
+		}
+		in.WantComma()
+	}
+	in.Delim('}')
+	if isTopLevel {
+		in.Consumed()
+	}
+}
+func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(out *jwriter.Writer, in PostDetails) {
+	out.RawByte('{')
+	first := true
+	_ = first
+	{
+		const prefix string = ",\"post\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		if in.Post == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.Post).MarshalJSON())
+		}
+	}
+	{
+		const prefix string = ",\"thread\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		if in.Thread == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.Thread).MarshalJSON())
+		}
+	}
+	{
+		const prefix string = ",\"forum\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		if in.Forum == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.Forum).MarshalJSON())
+		}
+	}
+	{
+		const prefix string = ",\"author\":"
+		if first {
+			first = false
+			out.RawString(prefix[1:])
+		} else {
+			out.RawString(prefix)
+		}
+		if in.Author == nil {
+			out.RawString("null")
+		} else {
+			out.Raw((*in.Author).MarshalJSON())
+		}
+	}
+	out.RawByte('}')
+}
+
+// MarshalJSON supports json.Marshaler interface
+func (v PostDetails) MarshalJSON() ([]byte, error) {
+	w := jwriter.Writer{}
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(&w, v)
+	return w.Buffer.BuildBytes(), w.Error
+}
+
+// MarshalEasyJSON supports easyjson.Marshaler interface
+func (v PostDetails) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(w, v)
+}
+
+// UnmarshalJSON supports json.Unmarshaler interface
+func (v *PostDetails) UnmarshalJSON(data []byte) error {
+	r := jlexer.Lexer{Data: data}
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(&r, v)
+	return r.Error()
+}
+
+// UnmarshalEasyJSON supports easyjson.Unmarshaler interface
+func (v *PostDetails) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(l, v)
+}
+func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(in *jlexer.Lexer, out *Post) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -446,7 +609,7 @@ func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(in *jlexer.
 		in.Consumed()
 	}
 }
-func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(out *jwriter.Writer, in Post) {
+func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(out *jwriter.Writer, in Post) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -557,27 +720,27 @@ func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(out *jwrite
 // MarshalJSON supports json.Marshaler interface
 func (v Post) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(&w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Post) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels3(w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Post) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(&r, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Post) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels3(l, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(l, v)
 }
-func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(in *jlexer.Lexer, out *Forum) {
+func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(in *jlexer.Lexer, out *Forum) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -616,7 +779,7 @@ func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(in *jlexer.
 		in.Consumed()
 	}
 }
-func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(out *jwriter.Writer, in Forum) {
+func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(out *jwriter.Writer, in Forum) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -676,27 +839,27 @@ func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(out *jwrite
 // MarshalJSON supports json.Marshaler interface
 func (v Forum) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(&w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Forum) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels4(w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Forum) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(&r, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Forum) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels4(l, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(l, v)
 }
-func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(in *jlexer.Lexer, out *Error) {
+func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels6(in *jlexer.Lexer, out *Error) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -727,7 +890,7 @@ func easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(in *jlexer.
 		in.Consumed()
 	}
 }
-func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(out *jwriter.Writer, in Error) {
+func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels6(out *jwriter.Writer, in Error) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -747,23 +910,23 @@ func easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(out *jwrite
 // MarshalJSON supports json.Marshaler interface
 func (v Error) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(&w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels6(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
 func (v Error) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels5(w, v)
+	easyjsonD2b7633eEncodeGithubComMalefaroTechnoparkDbForumModels6(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
 func (v *Error) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(&r, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels6(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
 func (v *Error) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels5(l, v)
+	easyjsonD2b7633eDecodeGithubComMalefaroTechnoparkDbForumModels6(l, v)
 }

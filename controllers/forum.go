@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
 	"github.com/lib/pq"
+	"github.com/mailru/easyjson"
 	"github.com/malefaro/technopark-db-forum/database"
 	"github.com/malefaro/technopark-db-forum/models"
 	"github.com/malefaro/technopark-db-forum/services"
@@ -18,7 +20,11 @@ type ForumController struct {
 	beego.Controller
 }
 
-
+func serveJson(data easyjson.Marshaler, output *context.BeegoOutput) {
+	output.Header("Content-Type", "application/json; charset=utf-8")
+	d, _ := easyjson.Marshal(data)
+	output.Body(d)
+}
 
 //func (c *ForumController) ServeJSON(){
 //	data, _ := easyjson.Marshal(c.Data["json"].(easyjson.Marshaler))
@@ -42,8 +48,9 @@ func (f *ForumController) Post() {
 	user, _ := models.GetUserByNickname(db, forum.Author)
 	if user == nil {
 		f.Ctx.Output.SetStatus(http.StatusNotFound)
-		f.Data["json"] = &models.Error{"Can'f find user with nickname "+forum.Author}
-		f.ServeJSON()
+		//f.Data["json"] = &models.Error{"Can'f find user with nickname "+forum.Author}
+		//f.ServeJSON()
+		serveJson(&models.Error{"Can'f find user with nickname "+forum.Author}, f.Ctx.Output)
 		return
 	}
 	forum.Author = user.Nickname
@@ -53,14 +60,16 @@ func (f *ForumController) Post() {
 			f.Ctx.Output.SetStatus(http.StatusConflict)
 			forum, err := models.GetForumBySlug(db, forum.Slug)
 			if err != nil { return }
-			f.Data["json"] = forum
-			f.ServeJSON()
+			//f.Data["json"] = forum
+			//f.ServeJSON()
+			serveJson(forum, f.Ctx.Output)
 			return
 		}
 	}
-	f.Data["json"] = forum
 	f.Ctx.Output.SetStatus(http.StatusCreated)
-	f.ServeJSON()
+	//f.Data["json"] = forum
+	//f.ServeJSON()
+	serveJson(forum, f.Ctx.Output)
 }
 
 // @Title Get
@@ -81,8 +90,9 @@ func (f *ForumController) Details() {
 	}
 
 	f.Ctx.Output.SetStatus(http.StatusOK)
-	f.Data["json"] = forum
-	f.ServeJSON()
+	//f.Data["json"] = forum
+	//f.ServeJSON()
+	serveJson(forum, f.Ctx.Output)
 }
 
 // @Title Get
@@ -121,14 +131,16 @@ func (f *ForumController) Create() {
 			f.Ctx.Output.SetStatus(http.StatusConflict)
 			thr, err := models.GetThreadBySlug(db, thread.Slug)
 			if err != nil { return }
-			f.Data["json"] = thr
-			f.ServeJSON()
+			//f.Data["json"] = thr
+			//f.ServeJSON()
+			serveJson(thr, f.Ctx.Output)
 			return
 		}
 	}
 	f.Ctx.Output.SetStatus(http.StatusCreated)
-	f.Data["json"] = thread
-	f.ServeJSON()
+	//f.Data["json"] = thread
+	//f.ServeJSON()
+	serveJson(thread, f.Ctx.Output)
 }
 
 
@@ -238,8 +250,8 @@ and b.slug = $1 %[1]s ORDER BY nickname %[2]s %[3]s`, addSince, desc, addLimit)
 	result, err = models.GetUsers(db,queryrow,args)
 	//fmt.Println(result)
 	if err != nil && err != sql.ErrNoRows{
-		funcname := services.GetFunctionName()
-		log.Printf("Function: %s, Error: %v",funcname , err)
+		//funcname := services.GetFunctionName()
+		//log.Printf("Function: %s, Error: %v",funcname , err)
 		return
 	}
 	f.Ctx.Output.SetStatus(http.StatusOK)

@@ -88,8 +88,9 @@ func (p *PostController) Get() {
 	}
 	result.Post = pd.Post
 	p.Ctx.Output.SetStatus(http.StatusOK)
-	p.Data["json"] = result
-	p.ServeJSON()
+	//p.Data["json"] = result
+	//p.ServeJSON()
+	serveJson(result, p.Ctx.Output)
 }
 
 // @Title Post
@@ -106,6 +107,7 @@ func (p *PostController) UpdatePosts() {
 	body := p.Ctx.Input.RequestBody
 	updatepost := &models.Post{}
 	json.Unmarshal(body, updatepost)
+	//easyjson.Unmarshal(body, updatepost)
 	//tx, err := db.Begin()
 	//if err != nil {
 	//	log.Println(err)
@@ -144,6 +146,7 @@ func (p *PostController) UpdatePosts() {
 		return
 	}
 	p.Ctx.Output.SetStatus(http.StatusOK)
-	p.Data["json"] = post
-	p.ServeJSON()
+	//p.Data["json"] = post
+	//p.ServeJSON()
+	serveJson(post, p.Ctx.Output)
 }

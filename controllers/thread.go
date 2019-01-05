@@ -168,8 +168,9 @@ func (t *ThreadController) UpdateThread() {
 		return
 	}
 	t.Ctx.Output.SetStatus(http.StatusOK)
-	t.Data["json"] = oldthread
-	t.ServeJSON()
+	//t.Data["json"] = oldthread
+	//t.ServeJSON()
+	serveJson(oldthread, t.Ctx.Output)
 }
 
 // @Title GetThread by slug or id
@@ -202,8 +203,9 @@ func (t *ThreadController) GetThread() {
 		}
 	}
 	t.Ctx.Output.SetStatus(http.StatusOK)
-	t.Data["json"] = thread
-	t.ServeJSON()
+	//t.Data["json"] = thread
+	//t.ServeJSON()
+	serveJson(thread, t.Ctx.Output)
 }
 
 // @Title GetThread by slug or id
@@ -271,8 +273,9 @@ func (t *ThreadController) CreateVote() {
 	}
 	thread.Votes += vote.Voice
 	t.Ctx.Output.SetStatus(http.StatusOK)
-	t.Data["json"] = thread
-	t.ServeJSON()
+	//t.Data["json"] = thread
+	//t.ServeJSON()
+	serveJson(thread, t.Ctx.Output)
 }
 
 func contains(s []int, e int) bool {

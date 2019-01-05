@@ -41,9 +41,10 @@ func (u *UserController) Post() {
 		return
 	}
 	models.CreateUser(db, user)
-	u.Data["json"] = user
 	u.Ctx.Output.SetStatus(http.StatusCreated)
-	u.ServeJSON()
+	//u.Data["json"] = user
+	//u.ServeJSON()
+	serveJson(user, u.Ctx.Output)
 }
 
 
@@ -63,9 +64,10 @@ func (u *UserController) ProfileGet() {
 		return
 	}
 	if user != nil {
-		u.Data["json"] = user
 		u.Ctx.Output.SetStatus(http.StatusOK)
-		u.ServeJSON()
+		//u.Data["json"] = user
+		//u.ServeJSON()
+		serveJson(user, u.Ctx.Output)
 		return
 	}
 	u.Data["json"] = &models.Error{"Can't find user with nickname " + nickname}
@@ -115,7 +117,8 @@ func (u *UserController) ProfilePost() {
 		log.Printf("PATH: %v, error: %v", u.Ctx.Input.URI(), err)
 		return
 	}
-	u.Data["json"] = user
 	u.Ctx.Output.SetStatus(http.StatusOK)
-	u.ServeJSON()
+	//u.Data["json"] = user
+	//u.ServeJSON()
+	serveJson(user, u.Ctx.Output)
 }
